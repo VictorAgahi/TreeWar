@@ -8,7 +8,7 @@ import { axiosClient } from '../../api/axiosClient';
 import { leaderboardApi } from '../../api/leaderboard.api';
 import type { LeaderboardEntry } from '../../api/leaderboard.api';
 
-export const HomePage: React.FC = () => {
+export const MapPage: React.FC = () => {
   const [leaderboard, setLeaderboard] = useState<LeaderboardEntry[]>([]);
 
   useEffect(() => {

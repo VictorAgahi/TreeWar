@@ -15,7 +15,7 @@ import type { NavLinkItemProps } from '../../molecules/NavLinkItem/NavLinkItem';
 import { useAuth } from '../../../context/AuthContext';
 
 const NAV_LINKS: Array<Pick<NavLinkItemProps, 'to' | 'label' | 'icon'>> = [
-  { to: '/', label: 'Carte', icon: <HomeIcon fontSize="small" /> },
+  { to: '/map', label: 'Carte', icon: <HomeIcon fontSize="small" /> },
   { to: '/dashboard', label: 'Dashboard', icon: <DashboardIcon fontSize="small" /> },
   { to: '/profile', label: 'Profil', icon: <PersonIcon fontSize="small" /> },
 ];
@@ -39,7 +39,7 @@ export const Navbar: React.FC = () => {
         <Toolbar sx={{ gap: 2 }}>
           <Box
             component={RouterLink}
-            to="/"
+            to="/map"
             sx={{ display: 'flex', alignItems: 'center', gap: 1, textDecoration: 'none', color: 'inherit', mr: 'auto' }}
           >
             <ForestIcon color="primary" fontSize="large" />

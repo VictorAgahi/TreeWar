@@ -1,4 +1,7 @@
 import React from 'react';
+import { Link as RouterLink } from 'react-router-dom';
+import { Box, Container, Stack, alpha, useTheme } from '@mui/material';
+import ForestIcon from '@mui/icons-material/Forest';
 import { Card } from '../../atoms/Card/Card';
 import { Typography } from '../../atoms/Typography/Typography';
 
@@ -15,33 +18,49 @@ export const AuthTemplate: React.FC<AuthTemplateProps> = ({
   children,
   footer,
 }) => {
+  const theme = useTheme();
+
   return (
-    <div
-      style={{
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
+    <Box
+      sx={{
         minHeight: '100vh',
-        backgroundColor: 'var(--bg)',
-        padding: '20px',
+        display: 'flex',
+        flexDirection: 'column',
+        bgcolor: 'background.default',
+        background: `linear-gradient(180deg, ${alpha(theme.palette.primary.main, 0.08)} 0%, ${alpha(theme.palette.primary.main, 0)} 45%)`,
       }}
     >
-      <Card style={{ width: '100%', maxWidth: '400px', padding: '32px' }}>
-        <Typography variant="h4" align="center" gutterBottom>
-          {title}
-        </Typography>
-        {subtitle && (
-          <Typography variant="body1" align="center" color="textSecondary" style={{ marginBottom: '24px' }}>
-            {subtitle}
+      <Container maxWidth="sm" sx={{ pt: { xs: 3, md: 4 }, display: 'flex', justifyContent: 'center' }}>
+        <Stack
+          component={RouterLink}
+          to="/"
+          direction="row"
+          spacing={1}
+          sx={{ alignItems: 'center', width: 'fit-content', textDecoration: 'none', color: 'inherit' }}
+        >
+          <ForestIcon color="primary" fontSize="large" />
+          <Typography variant="h6" sx={{ fontWeight: 700 }}>
+            TreeWar
           </Typography>
-        )}
-        {children}
-        {footer && (
-          <div style={{ marginTop: '24px', textAlign: 'center' }}>
-            {footer}
-          </div>
-        )}
-      </Card>
-    </div>
+        </Stack>
+      </Container>
+
+      <Box sx={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', px: 2, py: 4 }}>
+        <Card sx={{ width: '100%', maxWidth: 440, '& .MuiCardContent-root': { p: { xs: 3, sm: 5 } } }}>
+          <Stack spacing={0.5} sx={{ mb: 3, textAlign: 'center' }}>
+            <Typography variant="h4" sx={{ fontWeight: 800 }}>
+              {title}
+            </Typography>
+            {subtitle && (
+              <Typography variant="body1" color="text.secondary">
+                {subtitle}
+              </Typography>
+            )}
+          </Stack>
+          {children}
+          {footer && <Box sx={{ mt: 3, textAlign: 'center' }}>{footer}</Box>}
+        </Card>
+      </Box>
+    </Box>
   );
 };
