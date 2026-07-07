@@ -13,7 +13,6 @@ import {
   TransactionAction,
   TransactionItemType,
 } from '../../transaction/domain/entities/transaction.entity';
-import { randomUUID } from 'crypto';
 
 @Injectable()
 export class TreeService {
