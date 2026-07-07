@@ -7,6 +7,7 @@ import { MainLayout } from './components/templates/MainLayout/MainLayout';
 import { HomePage } from './pages/HomePage/HomePage';
 import { DashboardPage } from './pages/DashboardPage/DashboardPage';
 import { ProfilePage } from './pages/ProfilePage/ProfilePage';
+import { AdminPage } from './pages/AdminPage/AdminPage';
 
 function App() {
   return (
@@ -15,6 +16,7 @@ function App() {
         <Routes>
           <Route path="/login" element={<LoginScreen />} />
           <Route path="/register" element={<RegisterScreen />} />
+          <Route path="/admin" element={<AdminPage />} />
 
           <Route element={<MainLayout />}>
             <Route index element={<HomePage />} />

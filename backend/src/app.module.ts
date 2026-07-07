@@ -3,6 +3,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { UserModule } from './modules/user/user.module';
 import { TreeModule } from './modules/tree/tree.module';
 import { TransactionModule } from './modules/transaction/transaction.module';
+import { AdminModule } from './modules/admin/admin.module';
 import { AppDataSource } from './data-source';
 
 @Module({
@@ -11,6 +12,7 @@ import { AppDataSource } from './data-source';
     UserModule,
     TreeModule,
     TransactionModule,
+    AdminModule,
   ],
 })
 export class AppModule {}

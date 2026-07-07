@@ -39,7 +39,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       });
       setUser(response.data);
     } catch {
-      // Token invalide ou expiré : on revient à l'état déconnecté.
       setToken(null);
       setUser(null);
     } finally {
