@@ -30,6 +30,15 @@ export const theme = createTheme({
     },
   },
   components: {
+    MuiCssBaseline: {
+      styleOverrides: {
+        // Rend la couleur de texte du thème autoritaire : le CSS résiduel du
+        // template Vite (index.css) impose sinon un gris hérité peu lisible.
+        body: {
+          color: 'rgba(0, 0, 0, 0.87)',
+        },
+      },
+    },
     MuiButton: {
       styleOverrides: {
         root: {
