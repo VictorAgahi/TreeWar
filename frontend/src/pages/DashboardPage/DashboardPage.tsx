@@ -1,36 +1,82 @@
 import React from 'react';
-import { Container, Stack, Box, Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from '@mui/material';
+import { Box, Container } from '@mui/material';
 import PaidIcon from '@mui/icons-material/Paid';
 import ParkIcon from '@mui/icons-material/Park';
 import AccountBalanceWalletIcon from '@mui/icons-material/AccountBalanceWallet';
 import MilitaryTechIcon from '@mui/icons-material/MilitaryTech';
-import { Card } from '../../components/atoms/Card/Card';
-import { Typography } from '../../components/atoms/Typography/Typography';
+import { KpiCard } from '../../components/molecules/KpiCard/KpiCard';
+import type { KpiCardProps } from '../../components/molecules/KpiCard/KpiCard';
+import { DashboardHeader } from '../../components/organisms/DashboardHeader/DashboardHeader';
+import { InvestmentChart } from '../../components/organisms/InvestmentChart/InvestmentChart';
+import { LeaderboardCard } from '../../components/organisms/LeaderboardCard/LeaderboardCard';
+import { PremiumTreeCard } from '../../components/organisms/PremiumTreeCard/PremiumTreeCard';
+import { RankProgressCard } from '../../components/organisms/RankProgressCard/RankProgressCard';
+import { RealImpactCard } from '../../components/organisms/RealImpactCard/RealImpactCard';
+import { SponsoredTreesTable } from '../../components/organisms/SponsoredTreesTable/SponsoredTreesTable';
+import { TransactionsHistory } from '../../components/organisms/TransactionsHistory/TransactionsHistory';
+import { DASHBOARD_MOCK } from '../../mocks/dashboard.mocks';
+import { formatCredits, formatNumberFr, formatOrdinalFr } from '../../utils/format';
+import {
+  getMostExpensiveTree,
+  getNextRankEntry,
+  getRealTreesPlanted,
+  getSpendingOverTime,
+  getTotalInvested,
+  getTransactionHistory,
+  getTreeMapLink,
+} from './dashboard.selectors';
 
-const STATS = [
-  { label: 'Total dépensé', value: '5 800 crédits', icon: <PaidIcon color="primary" /> },
-  { label: 'Arbres possédés', value: '12', icon: <ParkIcon color="primary" /> },
-  { label: 'Crédits restants', value: '4 200', icon: <AccountBalanceWalletIcon color="primary" /> },
-  { label: 'Rang actuel', value: '3ème / 24', icon: <MilitaryTechIcon color="primary" /> },
-];
-
-const OWNED_TREES = [
-  { species: 'Platane', arrondissement: 15, price: 320, date: '06/07/2026' },
-  { species: 'Marronnier', arrondissement: 7, price: 480, date: '05/07/2026' },
-  { species: 'Tilleul', arrondissement: 15, price: 210, date: '04/07/2026' },
-];
+// Le backend n'expose pas encore d'endpoint dashboard : les données viennent des
+// fixtures locales, à remplacer par la future couche API (src/api).
+const dashboard = DASHBOARD_MOCK;
 
 export const DashboardPage: React.FC = () => {
+  const { companyName, creditsRemaining, rank, totalCompanies, leaderboard, sponsoredTrees } = dashboard;
+
+  const totalInvested = getTotalInvested(sponsoredTrees);
+  const realTreesPlanted = getRealTreesPlanted(totalInvested);
+  const mostExpensiveTree = getMostExpensiveTree(sponsoredTrees);
+  const nextRankEntry = getNextRankEntry(leaderboard, rank);
+  const spendingOverTime = getSpendingOverTime(sponsoredTrees);
+  const transactions = getTransactionHistory(sponsoredTrees);
+
+  const currentLeaderboardEntry = leaderboard.find((entry) => entry.companyName === companyName) ?? {
+    rank,
+    companyName,
+    totalInvested,
+    sponsoredTreesCount: sponsoredTrees.length,
+  };
+
+  const kpis: KpiCardProps[] = [
+    {
+      label: 'Montant investi',
+      value: formatCredits(totalInvested),
+      description: "Total dépensé dans le sponsoring d'arbres",
+      icon: <PaidIcon color="primary" />,
+    },
+    {
+      label: 'Arbres sponsorisés',
+      value: formatNumberFr(sponsoredTrees.length),
+      description: 'Arbres actuellement détenus par votre entreprise',
+      icon: <ParkIcon color="primary" />,
+    },
+    {
+      label: 'Crédits restants',
+      value: formatCredits(creditsRemaining),
+      description: 'Budget encore disponible',
+      icon: <AccountBalanceWalletIcon color="primary" />,
+    },
+    {
+      label: 'Rang actuel',
+      value: `${formatOrdinalFr(rank)} / ${totalCompanies}`,
+      description: 'Position dans le leaderboard des entreprises',
+      icon: <MilitaryTechIcon color="primary" />,
+    },
+  ];
+
   return (
     <Container maxWidth="lg" sx={{ py: 4, flex: 1, display: 'flex', flexDirection: 'column', gap: 3 }}>
-      <Stack spacing={1}>
-        <Typography variant="h4" sx={{ fontWeight: 700 }}>
-          Mon Dashboard
-        </Typography>
-        <Typography variant="body1" color="text.secondary">
-          Vos investissements et votre position dans la compétition.
-        </Typography>
-      </Stack>
+      <DashboardHeader companyName={companyName} mapPath="/" />
 
       <Box
         sx={{
@@ -39,50 +85,28 @@ export const DashboardPage: React.FC = () => {
           gap: 2,
         }}
       >
-        {STATS.map((stat) => (
-          <Card key={stat.label}>
-            <Stack direction="row" spacing={1.5} sx={{ alignItems: 'center' }}>
-              {stat.icon}
-              <Stack>
-                <Typography variant="body2" color="text.secondary">
-                  {stat.label}
-                </Typography>
-                <Typography variant="h6" sx={{ fontWeight: 700 }}>
-                  {stat.value}
-                </Typography>
-              </Stack>
-            </Stack>
-          </Card>
+        {kpis.map((kpi) => (
+          <KpiCard key={kpi.label} {...kpi} />
         ))}
       </Box>
 
-      <Card noPadding>
-        <Box sx={{ p: 2, pb: 0 }}>
-          <Typography variant="h6">Arbres possédés</Typography>
-        </Box>
-        <TableContainer>
-          <Table>
-            <TableHead>
-              <TableRow>
-                <TableCell>Espèce</TableCell>
-                <TableCell>Arrondissement</TableCell>
-                <TableCell align="right">Prix payé</TableCell>
-                <TableCell align="right">Date d'achat</TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {OWNED_TREES.map((tree) => (
-                <TableRow key={`${tree.species}-${tree.arrondissement}-${tree.date}`}>
-                  <TableCell>{tree.species}</TableCell>
-                  <TableCell>{tree.arrondissement}ème</TableCell>
-                  <TableCell align="right">{tree.price} crédits</TableCell>
-                  <TableCell align="right">{tree.date}</TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </TableContainer>
-      </Card>
+      <RealImpactCard realTreesPlanted={realTreesPlanted} />
+
+      {nextRankEntry ? <RankProgressCard currentInvested={totalInvested} nextRankEntry={nextRankEntry} /> : null}
+
+      <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', md: '5fr 7fr' }, gap: 3 }}>
+        {mostExpensiveTree ? (
+          <PremiumTreeCard tree={mostExpensiveTree} mapLink={getTreeMapLink(mostExpensiveTree)} />
+        ) : null}
+        <LeaderboardCard topEntries={leaderboard} currentEntry={currentLeaderboardEntry} />
+      </Box>
+
+      <SponsoredTreesTable trees={sponsoredTrees} getMapLink={getTreeMapLink} />
+
+      <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', md: '7fr 5fr' }, gap: 3 }}>
+        <InvestmentChart points={spendingOverTime} />
+        <TransactionsHistory transactions={transactions} />
+      </Box>
     </Container>
   );
 };
