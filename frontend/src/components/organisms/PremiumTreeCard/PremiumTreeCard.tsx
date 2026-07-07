@@ -12,17 +12,19 @@ import { formatCredits, formatDateFr, formatOrdinalFr } from '../../../utils/for
 
 export interface PremiumTreeCardProps {
   tree: SponsoredTree;
-  /** Lien vers la page carte, centrée sur l'arbre. */
   mapLink: string;
+  rank?: number;
 }
 
-export const PremiumTreeCard: React.FC<PremiumTreeCardProps> = ({ tree, mapLink }) => {
+export const PremiumTreeCard: React.FC<PremiumTreeCardProps> = ({ tree, mapLink, rank }) => {
   return (
     <Card component="section" sx={{ height: '100%' }}>
       <Stack spacing={2} sx={{ height: '100%' }}>
-        <Typography variant="h6" component="h2" sx={{ color: 'primary.dark', fontWeight: 700 }}>
-          Arbre le plus cher
-        </Typography>
+        {rank !== undefined && (
+          <Typography variant="h6" component="h2" sx={{ color: 'primary.main', fontWeight: 700 }}>
+            Top {rank}
+          </Typography>
+        )}
         <Stack direction="row" spacing={2} sx={{ alignItems: 'flex-start', flex: 1 }}>
           <Box
             sx={{

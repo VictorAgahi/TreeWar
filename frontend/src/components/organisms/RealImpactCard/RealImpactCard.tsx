@@ -8,9 +8,11 @@ import { formatNumberFr } from '../../../utils/format';
 export interface RealImpactCardProps {
   /** Arbres plantés financés par les crédits investis. */
   realTreesPlanted: number;
+  title?: string;
+  subtitle?: string;
 }
 
-export const RealImpactCard: React.FC<RealImpactCardProps> = ({ realTreesPlanted }) => {
+export const RealImpactCard: React.FC<RealImpactCardProps> = ({ realTreesPlanted, title, subtitle }) => {
   const theme = useTheme();
 
   return (
@@ -44,13 +46,13 @@ export const RealImpactCard: React.FC<RealImpactCardProps> = ({ realTreesPlanted
         </Box>
         <Stack spacing={0.25}>
           <Typography variant="body2" color="text.secondary">
-            Impact réel
+            {title || 'Impact réel'}
           </Typography>
           <Typography variant="h4" component="p" color="primary.dark" sx={{ fontWeight: 700 }}>
             {formatNumberFr(realTreesPlanted)} arbres plantés
           </Typography>
           <Typography variant="body2" color="text.secondary">
-            Financés par vos crédits investis.
+            {subtitle || 'Financés par vos crédits investis.'}
           </Typography>
         </Stack>
       </Stack>

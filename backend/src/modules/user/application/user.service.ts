@@ -8,12 +8,18 @@ import * as bcrypt from 'bcrypt';
 import { UserRepository } from '../infrastructure/repositories/user.repository';
 import { RegisterDto } from '../presentation/dtos/register.dto';
 import { LoginDto } from '../presentation/dtos/login.dto';
+import { TransactionRepository } from '../../transaction/infrastructure/repositories/transaction.repository';
+import {
+  TransactionAction,
+  TransactionItemType,
+} from '../../transaction/domain/entities/transaction.entity';
 
 @Injectable()
 export class UserService {
   constructor(
     private readonly userRepository: UserRepository,
     private readonly jwtService: JwtService,
+    private readonly transactionRepository: TransactionRepository,
   ) {}
 
   async register(registerDto: RegisterDto) {
@@ -96,5 +102,31 @@ export class UserService {
 
   async getTopUsersByMostExpensiveTree(limit: number = 10) {
     return this.userRepository.getTopUsersByMostExpensiveTree(limit);
+  }
+
+  async topup(userId: string, amount: number) {
+    if (amount <= 0) {
+      throw new ConflictException('Montant invalide.');
+    }
+
+    const user = await this.userRepository.findById(userId);
+    if (!user) {
+      throw new UnauthorizedException('Utilisateur introuvable.');
+    }
+
+    user.credits += amount;
+    await this.userRepository.save(user);
+
+    const transaction = this.transactionRepository.create({
+      action: TransactionAction.RECHARGE,
+      itemType: TransactionItemType.CREDITS,
+      itemId: user.id,
+      itemName: `Pack de ${amount} TreeCoins`,
+      price: amount,
+      userId: user.id,
+    });
+    await this.transactionRepository.save(transaction);
+
+    return user;
   }
 }

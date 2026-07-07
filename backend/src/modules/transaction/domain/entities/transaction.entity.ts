@@ -10,10 +10,12 @@ import { User } from '../../../user/domain/entities/user.entity';
 
 export enum TransactionAction {
   BUY = 'BUY',
+  RECHARGE = 'RECHARGE',
 }
 
 export enum TransactionItemType {
   TREE = 'TREE',
+  CREDITS = 'CREDITS',
 }
 
 @Entity('transactions')

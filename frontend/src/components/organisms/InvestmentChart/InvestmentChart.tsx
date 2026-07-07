@@ -51,7 +51,7 @@ export const InvestmentChart: React.FC<InvestmentChartProps> = ({ points }) => {
   return (
     <Card component="section" sx={{ height: '100%' }}>
       <Stack spacing={2}>
-        <Typography variant="h6" component="h2" sx={{ color: 'primary.dark', fontWeight: 700 }}>
+        <Typography variant="h6" component="h2" sx={{ color: 'primary.main', fontWeight: 700 }}>
           Évolution de vos investissements
         </Typography>
         <Box

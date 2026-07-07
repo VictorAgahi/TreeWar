@@ -57,18 +57,26 @@ export class UserRepository {
       .getRawMany();
   }
 
-  async getTopUsersByMostExpensiveTree(limit: number) {
-    return this.repository
-      .createQueryBuilder('user')
-      .leftJoin('user.trees', 'tree')
-      .select([
-        'user.id AS id',
-        'user.username AS username',
-        'COALESCE(MAX(tree.price), 0)::int AS "maxTreePrice"',
-      ])
-      .groupBy('user.id')
-      .orderBy('"maxTreePrice"', 'DESC')
-      .limit(limit)
-      .getRawMany();
+  async getTopUsersByMostExpensiveTree(
+    limit: number,
+  ): Promise<
+    { id: string; username: string; maxTreePrice: number; maxTreeId: string }[]
+  > {
+    return this.repository.query(
+      `
+      WITH RankedTrees AS (
+        SELECT "ownerId", price, id,
+               ROW_NUMBER() OVER(PARTITION BY "ownerId" ORDER BY price DESC) as rn
+        FROM trees
+        WHERE "ownerId" IS NOT NULL
+      )
+      SELECT u.id as "id", u.username as "username", COALESCE(r.price, 0)::int as "maxTreePrice", r.id as "maxTreeId"
+      FROM users u
+      LEFT JOIN RankedTrees r ON r."ownerId" = u.id AND r.rn = 1
+      ORDER BY "maxTreePrice" DESC NULLS LAST
+      LIMIT $1
+    `,
+      [limit],
+    );
   }
 }

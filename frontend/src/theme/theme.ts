@@ -1,20 +1,21 @@
-import { createTheme } from '@mui/material/styles';
+import { createTheme, type PaletteMode } from '@mui/material/styles';
 
-export const theme = createTheme({
+export const getAppTheme = (mode: PaletteMode) => createTheme({
   palette: {
+    mode,
     primary: {
-      main: '#2e7d32', // Forest green
+      main: mode === 'light' ? '#2e7d32' : '#81c784', // Forest green / Light green
       light: '#60ad5e',
       dark: '#005005',
     },
     secondary: {
-      main: '#d32f2f', // Heatwave red
+      main: mode === 'light' ? '#d32f2f' : '#e57373', // Heatwave red / Light red
       light: '#ff6659',
       dark: '#9a0007',
     },
     background: {
-      default: '#f5f5f5',
-      paper: '#ffffff',
+      default: mode === 'light' ? '#f5f5f5' : '#121212',
+      paper: mode === 'light' ? '#ffffff' : '#1e1e1e',
     },
   },
   typography: {
@@ -32,10 +33,9 @@ export const theme = createTheme({
   components: {
     MuiCssBaseline: {
       styleOverrides: {
-        // Rend la couleur de texte du thème autoritaire : le CSS résiduel du
-        // template Vite (index.css) impose sinon un gris hérité peu lisible.
         body: {
-          color: 'rgba(0, 0, 0, 0.87)',
+          color: mode === 'light' ? 'rgba(0, 0, 0, 0.87)' : '#ffffff',
+          backgroundColor: mode === 'light' ? '#f5f5f5' : '#121212',
         },
       },
     },

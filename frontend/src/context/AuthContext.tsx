@@ -38,9 +38,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         headers: { Authorization: `Bearer ${currentToken}` },
       });
       setUser(response.data);
-    } catch {
-      setToken(null);
-      setUser(null);
+    } catch (error: any) {
+      // Seulement déconnecter l'utilisateur si le token est explicitement rejeté (401)
+      if (error.response?.status === 401) {
+        setToken(null);
+        setUser(null);
+      }
+      // En cas d'erreur réseau, on garde le token pour qu'au retour du réseau,
+      // l'utilisateur n'ait pas à se reconnecter.
     } finally {
       setIsLoadingUser(false);
     }

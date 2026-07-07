@@ -1,12 +1,11 @@
 import React, { useEffect, useState } from 'react';
-import { Box, Container, CircularProgress } from '@mui/material';
+import { Box, Container, CircularProgress, Typography } from '@mui/material';
 import PaidIcon from '@mui/icons-material/Paid';
 import ParkIcon from '@mui/icons-material/Park';
 import AccountBalanceWalletIcon from '@mui/icons-material/AccountBalanceWallet';
 import { KpiCard } from '../../components/molecules/KpiCard/KpiCard';
 import type { KpiCardProps } from '../../components/molecules/KpiCard/KpiCard';
 import { DashboardHeader } from '../../components/organisms/DashboardHeader/DashboardHeader';
-import { InvestmentChart } from '../../components/organisms/InvestmentChart/InvestmentChart';
 import { LeaderboardCard } from '../../components/organisms/LeaderboardCard/LeaderboardCard';
 import { PremiumTreeCard } from '../../components/organisms/PremiumTreeCard/PremiumTreeCard';
 import { RankProgressCard } from '../../components/organisms/RankProgressCard/RankProgressCard';
@@ -18,21 +17,15 @@ import { axiosClient } from '../../api/axiosClient';
 import { userApi, type LeaderboardUser } from '../../api/user.api';
 import { treeApi, type BackendTree as Tree } from '../../api/tree.api';
 import { transactionApi, type Transaction } from '../../api/transaction.api';
+import type { LeaderboardEntry } from '../../types/dashboard.types';
 
 import {
-  getMostExpensiveTree,
+  getTop3ExpensiveTrees,
   getRealTreesPlanted,
-  getSpendingOverTime,
   getTotalInvested,
   getTreeMapLink,
 } from './dashboard.selectors';
 
-type LeaderboardEntry = {
-  rank: number;
-  companyName: string;
-  totalInvested: number;
-  sponsoredTreesCount: number;
-};
 
 export const DashboardPage: React.FC = () => {
   const { user } = useAuth();
@@ -105,14 +98,15 @@ export const DashboardPage: React.FC = () => {
     arrondissement: 1, // Fallback
     pricePaid: t.price,
     purchasedAt: t.createdAt,
-    lat: t.lat,
-    lon: t.lng,
+    lat: t.lat || 0,
+    lon: t.lng || 0,
+    itemType: t.itemType,
   }));
 
   const totalInvested = getTotalInvested(sponsoredTrees);
   const realTreesPlanted = getRealTreesPlanted(totalInvested);
-  const mostExpensiveTree = getMostExpensiveTree(sponsoredTrees);
-  const spendingOverTime = getSpendingOverTime(mappedTransactions); // Pass transactions to get true spending over time
+  const top3Trees = getTop3ExpensiveTrees(sponsoredTrees);
+  const mostExpensiveTree = top3Trees.length > 0 ? top3Trees[0] : null;
 
   const parseLeaderboard = (users: LeaderboardUser[]): LeaderboardEntry[] => 
     users.map((u, index) => ({
@@ -121,6 +115,7 @@ export const DashboardPage: React.FC = () => {
       totalInvested: u.totalValue || 0,
       sponsoredTreesCount: u.treeCount || 0,
       maxTreePrice: u.maxTreePrice || 0,
+      maxTreeId: u.maxTreeId,
     }));
 
   const leaderboardTV = parseLeaderboard(leaderboardTotalValue);
@@ -140,6 +135,7 @@ export const DashboardPage: React.FC = () => {
         totalInvested,
         sponsoredTreesCount: sponsoredTrees.length,
         maxTreePrice: mostExpensiveTree?.pricePaid || 0,
+        maxTreeId: mostExpensiveTree?.id,
       };
 
   const kpis: KpiCardProps[] = [
@@ -183,11 +179,18 @@ export const DashboardPage: React.FC = () => {
 
       {nextRankEntry && rank > 0 ? <RankProgressCard currentInvested={totalInvested} nextRankEntry={nextRankEntry} /> : null}
 
-      {mostExpensiveTree ? (
-        <Box sx={{ width: { xs: '100%', md: '50%' }, alignSelf: 'center' }}>
-          <PremiumTreeCard tree={mostExpensiveTree} mapLink={getTreeMapLink(mostExpensiveTree)} />
+      {top3Trees.length > 0 && (
+        <Box component="section">
+          <Typography variant="h6" component="h2" sx={{ color: 'primary.main', fontWeight: 700, mb: 2 }}>
+            Vos arbres les plus chers
+          </Typography>
+          <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', md: 'repeat(3, 1fr)' }, gap: 3 }}>
+            {top3Trees.map((t, index) => (
+              <PremiumTreeCard key={t.id} tree={t} mapLink={getTreeMapLink(t)} rank={index + 1} />
+            ))}
+          </Box>
         </Box>
-      ) : null}
+      )}
 
       <LeaderboardCard 
         topEntriesTV={leaderboardTV} 
@@ -196,10 +199,7 @@ export const DashboardPage: React.FC = () => {
         currentEntry={currentLeaderboardEntry} 
       />
 
-      <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', md: '7fr 5fr' }, gap: 3 }}>
-        <InvestmentChart points={spendingOverTime} />
-        <TransactionsHistory transactions={mappedTransactions} />
-      </Box>
+      <TransactionsHistory transactions={mappedTransactions} />
     </Container>
   );
 };

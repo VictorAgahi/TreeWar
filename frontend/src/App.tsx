@@ -9,6 +9,8 @@ import { MapPage } from './pages/MapPage/MapPage';
 import { DashboardPage } from './pages/DashboardPage/DashboardPage';
 import { ProfilePage } from './pages/ProfilePage/ProfilePage';
 import { AdminPage } from './pages/AdminPage/AdminPage';
+import { StatsPage } from './pages/StatsPage/StatsPage';
+import { BankPage } from './pages/BankPage/BankPage';
 
 function App() {
   return (
@@ -24,6 +26,8 @@ function App() {
             <Route path="map" element={<MapPage />} />
             <Route element={<ProtectedRoute />}>
               <Route path="dashboard" element={<DashboardPage />} />
+              <Route path="stats" element={<StatsPage />} />
+              <Route path="bank" element={<BankPage />} />
               <Route path="profile" element={<ProfilePage />} />
             </Route>
           </Route>

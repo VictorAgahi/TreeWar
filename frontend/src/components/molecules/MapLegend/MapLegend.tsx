@@ -28,12 +28,10 @@ export const MapLegend: React.FC = () => {
         <Stack direction="row" spacing={1} sx={{ alignItems: 'center' }}>
           <Box
             sx={{
-              width: 14,
-              height: 14,
+              width: 12,
+              height: 12,
               borderRadius: '50%',
               bgcolor: TREE_MARKER_COLORS.remarkable,
-              border: '2px solid white',
-              boxShadow: '0 0 0 1px rgba(0,0,0,0.15)',
             }}
           />
           <Typography variant="body2">Arbre remarquable</Typography>

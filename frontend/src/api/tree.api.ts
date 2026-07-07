@@ -35,11 +35,9 @@ export const treeApi = {
   }),
 };
 
-const coordKey = (lat: number, lon: number) => `${lat.toFixed(6)},${lon.toFixed(6)}`;
+const coordKey = (lat: number, lon: number) => `${lat.toFixed(5)},${lon.toFixed(5)}`;
 
-// The backend only knows about trees that have already been sponsored — it has no
-// notion of the open-data catalog. We correlate the two by exact coordinate match
-// (both sides use the same lat/lng, so no tolerance needed).
+
 export function mergeTreeSponsorships(trees: ParisTree[], backendTrees: BackendTree[]): ParisTree[] {
   const byCoord = new Map<string, BackendTree>();
   for (const backendTree of backendTrees) {
@@ -54,6 +52,7 @@ export function mergeTreeSponsorships(trees: ParisTree[], backendTrees: BackendT
     }
     return {
       ...tree,
+      name: match.name || tree.name,
       sponsorship: {
         status: 'sponsored',
         companyName: match.owner?.username ?? 'Entreprise',

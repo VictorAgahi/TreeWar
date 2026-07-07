@@ -4,6 +4,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { Container, Stack, Box, Divider, Dialog, DialogTitle, DialogContent, DialogActions } from '@mui/material';
 import EmailIcon from '@mui/icons-material/Email';
+import LogoutIcon from '@mui/icons-material/Logout';
 import { Card } from '../../components/atoms/Card/Card';
 import { Typography } from '../../components/atoms/Typography/Typography';
 import { Avatar } from '../../components/atoms/Avatar/Avatar';
@@ -75,7 +76,7 @@ const EditUsernameDialog: React.FC<{
 };
 
 export const ProfilePage: React.FC = () => {
-  const { user, isLoadingUser, refreshUser } = useAuth();
+  const { user, isLoadingUser, refreshUser, logout } = useAuth();
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
 
   if (isLoadingUser || !user) {
@@ -129,6 +130,10 @@ export const ProfilePage: React.FC = () => {
 
           <Button variant="outlined" color="primary" onClick={() => setIsEditDialogOpen(true)}>
             Modifier le profil
+          </Button>
+
+          <Button variant="outlined" color="error" onClick={logout} startIcon={<LogoutIcon />}>
+            Se déconnecter
           </Button>
         </Stack>
       </Card>

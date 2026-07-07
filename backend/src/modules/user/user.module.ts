@@ -8,6 +8,7 @@ import { UserRepository } from './infrastructure/repositories/user.repository';
 import { UserService } from './application/user.service';
 import { UserController } from './presentation/controllers/user.controller';
 import { JwtStrategy } from '../../common/strategies/jwt.strategy';
+import { TransactionModule } from '../transaction/transaction.module';
 
 const privateKey = fs.readFileSync(
   path.join(process.cwd(), 'keys/private.pem'),
@@ -32,6 +33,7 @@ const publicKey = fs.readFileSync(
         algorithms: ['RS256'],
       },
     }),
+    TransactionModule,
   ],
   controllers: [UserController],
   providers: [UserRepository, UserService, JwtStrategy],

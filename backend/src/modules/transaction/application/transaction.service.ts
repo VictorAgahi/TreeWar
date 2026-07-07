@@ -21,4 +21,22 @@ export class TransactionService {
       relations: { user: true },
     });
   }
+
+  async getTotalStats() {
+    const creditsResult = (await this.transactionRepository
+      .createQueryBuilder('tx')
+      .select('SUM(tx.price)', 'totalCredits')
+      .getRawOne()) as { totalCredits: string | number | null };
+
+    const treesResult = (await this.transactionRepository
+      .createQueryBuilder('tx')
+      .select('COUNT(DISTINCT tx.itemId)', 'totalTrees')
+      .where('tx.itemType = :type', { type: TransactionItemType.TREE })
+      .getRawOne()) as { totalTrees: string | number | null };
+
+    return {
+      totalCredits: Number(creditsResult?.totalCredits) || 0,
+      totalTrees: Number(treesResult?.totalTrees) || 0,
+    };
+  }
 }

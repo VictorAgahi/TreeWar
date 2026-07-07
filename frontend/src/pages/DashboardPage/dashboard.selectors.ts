@@ -11,11 +11,12 @@ export const getTotalInvested = (trees: SponsoredTree[]): number =>
 export const getRealTreesPlanted = (totalInvested: number): number =>
   Math.floor(totalInvested / CREDITS_PER_REAL_TREE);
 
-export const getMostExpensiveTree = (trees: SponsoredTree[]): SponsoredTree | undefined => {
+export const getTop3ExpensiveTrees = (trees: SponsoredTree[]): SponsoredTree[] => {
   if (trees.length === 0) {
-    return undefined;
+    return [];
   }
-  return trees.reduce((mostExpensive, tree) => (tree.pricePaid > mostExpensive.pricePaid ? tree : mostExpensive));
+  const sorted = [...trees].sort((a, b) => b.pricePaid - a.pricePaid);
+  return sorted.slice(0, 3);
 };
 
 /** Cumul des investissements par jour d'achat, en ordre chronologique. */
@@ -30,4 +31,4 @@ export const getSpendingOverTime = (trees: SponsoredTree[]): SpendingPoint[] => 
 };
 
 export const getTreeMapLink = (tree: SponsoredTree): string =>
-  `/?treeId=${encodeURIComponent(tree.id)}&lat=${tree.lat}&lon=${tree.lon}`;
+  `/map?treeId=${encodeURIComponent(tree.id)}&lat=${tree.lat}&lon=${tree.lon}`;

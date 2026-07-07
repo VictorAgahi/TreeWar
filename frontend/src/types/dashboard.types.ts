@@ -9,6 +9,7 @@ export interface SponsoredTree {
   purchasedAt: string;
   lat: number;
   lon: number;
+  itemType?: string;
 }
 
 export interface LeaderboardEntry {
@@ -18,6 +19,7 @@ export interface LeaderboardEntry {
   totalInvested: number;
   sponsoredTreesCount: number;
   maxTreePrice?: number;
+  maxTreeId?: string;
 }
 
 export interface CompanyDashboardData {

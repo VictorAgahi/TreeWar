@@ -7,6 +7,7 @@ import {
   HttpCode,
   HttpStatus,
   UseGuards,
+  Query,
 } from '@nestjs/common';
 import { UserService } from '../../application/user.service';
 import { RegisterDto } from '../dtos/register.dto';
@@ -55,17 +56,27 @@ export class UserController {
   }
 
   @Get('leaderboard/most-trees')
-  async getTopByTrees() {
-    return this.userService.getTopUsersByTreeCount(10);
+  async getTopByTrees(@Query('limit') limit?: number) {
+    return this.userService.getTopUsersByTreeCount(limit ? Number(limit) : 10);
   }
 
   @Get('leaderboard/total-value')
-  async getTopByTotalValue() {
-    return this.userService.getTopUsersByTotalTreeValue(10);
+  async getTopByTotalValue(@Query('limit') limit?: number) {
+    return this.userService.getTopUsersByTotalTreeValue(
+      limit ? Number(limit) : 10,
+    );
   }
 
   @Get('leaderboard/most-expensive-tree')
-  async getTopByExpensiveTree() {
-    return this.userService.getTopUsersByMostExpensiveTree(10);
+  async getTopByExpensiveTree(@Query('limit') limit?: number) {
+    return this.userService.getTopUsersByMostExpensiveTree(
+      limit ? Number(limit) : 10,
+    );
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Post('topup')
+  async topup(@CurrentUser() user: JwtPayload, @Body('amount') amount: number) {
+    return this.userService.topup(user.sub, Number(amount));
   }
 }

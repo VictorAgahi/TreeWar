@@ -7,6 +7,8 @@ import ForestIcon from '@mui/icons-material/Forest';
 import HomeIcon from '@mui/icons-material/Home';
 import DashboardIcon from '@mui/icons-material/Dashboard';
 import PersonIcon from '@mui/icons-material/Person';
+import BarChartIcon from '@mui/icons-material/BarChart';
+import AccountBalanceWalletIcon from '@mui/icons-material/AccountBalanceWallet';
 import { Typography } from '../../atoms/Typography/Typography';
 import { IconButton } from '../../atoms/IconButton/IconButton';
 import { NavLinksList } from '../../molecules/NavLinksList/NavLinksList';
@@ -17,6 +19,8 @@ import { useAuth } from '../../../context/AuthContext';
 const NAV_LINKS: Array<Pick<NavLinkItemProps, 'to' | 'label' | 'icon'>> = [
   { to: '/map', label: 'Carte', icon: <HomeIcon fontSize="small" /> },
   { to: '/dashboard', label: 'Dashboard', icon: <DashboardIcon fontSize="small" /> },
+  { to: '/stats', label: 'Statistiques', icon: <BarChartIcon fontSize="small" /> },
+  { to: '/bank', label: 'Banque', icon: <AccountBalanceWalletIcon fontSize="small" /> },
   { to: '/profile', label: 'Profil', icon: <PersonIcon fontSize="small" /> },
 ];
 

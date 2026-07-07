@@ -14,6 +14,11 @@ export class TransactionController {
     return this.transactionService.getMyTransactions(user.sub);
   }
 
+  @Get('stats')
+  async getTotalStats() {
+    return this.transactionService.getTotalStats();
+  }
+
   @Get('tree/:id')
   async getTreeTransactions(@Param('id') treeId: string) {
     return this.transactionService.getTreeTransactions(treeId);

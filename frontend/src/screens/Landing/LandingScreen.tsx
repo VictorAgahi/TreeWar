@@ -12,6 +12,7 @@ import { Card } from '../../components/atoms/Card/Card';
 import { Chip } from '../../components/atoms/Chip/Chip';
 import { Typography } from '../../components/atoms/Typography/Typography';
 import { Button } from '../../components/atoms/Button/Button';
+import { useAuth } from '../../context/AuthContext';
 
 const FEATURES = [
   {
@@ -130,6 +131,7 @@ const HeroMockup: React.FC = () => {
 
 export const LandingScreen: React.FC = () => {
   const theme = useTheme();
+  const { isAuthenticated } = useAuth();
 
   return (
     <Box sx={{ bgcolor: 'background.default', minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
@@ -150,12 +152,20 @@ export const LandingScreen: React.FC = () => {
               </Typography>
             </Stack>
             <Stack direction="row" spacing={1.5}>
-              <Button component={RouterLink} to="/login" variant="text" color="primary">
-                Se connecter
-              </Button>
-              <Button component={RouterLink} to="/register" variant="contained" color="primary">
-                Créer un compte
-              </Button>
+              {isAuthenticated ? (
+                <Button component={RouterLink} to="/dashboard" variant="contained" color="primary">
+                  Accéder à mon espace
+                </Button>
+              ) : (
+                <>
+                  <Button component={RouterLink} to="/login" variant="text" color="primary">
+                    Se connecter
+                  </Button>
+                  <Button component={RouterLink} to="/register" variant="contained" color="primary">
+                    Créer un compte
+                  </Button>
+                </>
+              )}
             </Stack>
           </Stack>
         </Container>
@@ -199,33 +209,45 @@ export const LandingScreen: React.FC = () => {
                 useFlexGap
                 sx={{ flexWrap: 'wrap', justifyContent: { xs: 'center', md: 'flex-start' }, pt: 1 }}
               >
-                <Button
-                  component={RouterLink}
-                  to="/register"
-                  variant="contained"
-                  color="primary"
-                  size="large"
-                  sx={{ flexShrink: 0 }}
-                >
-                  Créer un compte gratuitement
-                </Button>
-                <Button
-                  component={RouterLink}
-                  to="/login"
-                  variant="outlined"
-                  color="primary"
-                  size="large"
-                  sx={{
-                    flexShrink: 0,
-                    bgcolor: 'background.paper',
-                    '&:hover': { bgcolor: 'background.paper' },
-                  }}
-                >
-                  Se connecter
-                </Button>
-              </Stack>
-
-              <Box sx={{ display: 'flex', justifyContent: 'center', width: '100%' }}>
+                {isAuthenticated ? (
+                  <Button
+                    component={RouterLink}
+                    to="/dashboard"
+                    variant="contained"
+                    color="primary"
+                    size="large"
+                    sx={{ flexShrink: 0 }}
+                  >
+                    Accéder à mon espace
+                  </Button>
+                ) : (
+                  <>
+                    <Button
+                      component={RouterLink}
+                      to="/register"
+                      variant="contained"
+                      color="primary"
+                      size="large"
+                      sx={{ flexShrink: 0 }}
+                    >
+                      Créer un compte gratuitement
+                    </Button>
+                    <Button
+                      component={RouterLink}
+                      to="/login"
+                      variant="outlined"
+                      color="primary"
+                      size="large"
+                      sx={{
+                        flexShrink: 0,
+                        bgcolor: 'background.paper',
+                        '&:hover': { bgcolor: 'background.paper' },
+                      }}
+                    >
+                      Se connecter
+                    </Button>
+                  </>
+                )}
                 <Button
                   component={RouterLink}
                   to="/map"
@@ -241,7 +263,7 @@ export const LandingScreen: React.FC = () => {
                 >
                   Voir la carte
                 </Button>
-              </Box>
+              </Stack>
             </Stack>
 
             <Box sx={{ flex: 1, width: '100%', display: 'flex', justifyContent: 'center', py: { xs: 2, md: 0 } }}>
@@ -311,7 +333,7 @@ export const LandingScreen: React.FC = () => {
             </Typography>
             <Button
               component={RouterLink}
-              to="/register"
+              to={isAuthenticated ? "/dashboard" : "/register"}
               variant="contained"
               size="large"
               sx={{
@@ -320,7 +342,7 @@ export const LandingScreen: React.FC = () => {
                 '&:hover': { bgcolor: alpha('#ffffff', 0.9) },
               }}
             >
-              Créer un compte gratuitement
+              {isAuthenticated ? "Accéder à mon espace" : "Créer un compte gratuitement"}
             </Button>
           </Stack>
         </Container>

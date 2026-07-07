@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
-import { alpha, Box, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, useTheme, Tabs, Tab } from '@mui/material';
+import { Link as RouterLink } from 'react-router-dom';
+import { alpha, Box, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, useTheme, Tabs, Tab, Tooltip, IconButton } from '@mui/material';
+import MapIcon from '@mui/icons-material/Map';
 import { Card } from '../../atoms/Card/Card';
 import { Chip } from '../../atoms/Chip/Chip';
 import { Typography } from '../../atoms/Typography/Typography';
@@ -39,6 +41,21 @@ export const LeaderboardCard: React.FC<LeaderboardCardProps> = ({ topEntriesTV, 
         {tabIndex === 0 && <TableCell align="right">{formatCredits(entry.totalInvested)}</TableCell>}
         {tabIndex === 1 && <TableCell align="right">{formatNumberFr(entry.sponsoredTreesCount)}</TableCell>}
         {tabIndex === 2 && <TableCell align="right">{formatCredits(entry.maxTreePrice || 0)}</TableCell>}
+        <TableCell align="right">
+          <Tooltip title="Voir sur la carte">
+            <IconButton 
+              component={RouterLink} 
+              to={tabIndex === 2 && entry.maxTreeId 
+                ? `/map?treeId=${entry.maxTreeId}` 
+                : `/map?company=${encodeURIComponent(entry.companyName)}`
+              }
+              color="primary"
+              size="small"
+            >
+              <MapIcon fontSize="small" />
+            </IconButton>
+          </Tooltip>
+        </TableCell>
       </TableRow>
     );
   };
@@ -46,7 +63,7 @@ export const LeaderboardCard: React.FC<LeaderboardCardProps> = ({ topEntriesTV, 
   return (
     <Card noPadding component="section" sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
       <Box sx={{ px: 2, pt: 2 }}>
-        <Typography variant="h6" component="h2" sx={{ color: 'primary.dark', fontWeight: 700 }}>
+        <Typography variant="h6" component="h2" sx={{ color: 'primary.main', fontWeight: 700 }}>
           Classement des entreprises
         </Typography>
         <Tabs 
@@ -70,6 +87,7 @@ export const LeaderboardCard: React.FC<LeaderboardCardProps> = ({ topEntriesTV, 
               {tabIndex === 0 && <TableCell align="right">Valeur totale</TableCell>}
               {tabIndex === 1 && <TableCell align="right">Arbres</TableCell>}
               {tabIndex === 2 && <TableCell align="right">Arbre Max</TableCell>}
+              <TableCell align="right">Action</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
@@ -77,7 +95,7 @@ export const LeaderboardCard: React.FC<LeaderboardCardProps> = ({ topEntriesTV, 
             {!isCurrentInTop ? (
               <>
                 <TableRow aria-hidden>
-                  <TableCell colSpan={3} align="center" sx={{ color: 'text.disabled', py: 0.5 }}>
+                  <TableCell colSpan={4} align="center" sx={{ color: 'text.disabled', py: 0.5 }}>
                     …
                   </TableCell>
                 </TableRow>

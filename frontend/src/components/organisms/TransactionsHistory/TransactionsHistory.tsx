@@ -23,7 +23,7 @@ export const TransactionsHistory: React.FC<TransactionsHistoryProps> = ({ transa
       <Stack spacing={2}>
         <Stack direction="row" spacing={1} sx={{ alignItems: 'center' }}>
           <HistoryIcon color="primary" />
-          <Typography variant="h6" component="h2" sx={{ color: 'primary.dark', fontWeight: 700 }}>
+          <Typography variant="h6" component="h2" sx={{ color: 'primary.main', fontWeight: 700 }}>
             Dernières transactions
           </Typography>
         </Stack>
@@ -45,13 +45,13 @@ export const TransactionsHistory: React.FC<TransactionsHistoryProps> = ({ transa
                   {formatDateFr(transaction.purchasedAt)}
                 </Typography>
                 <Typography variant="body2" sx={{ fontWeight: 600 }}>
-                  {transaction.species}
+                  {transaction.itemType === 'CREDITS' ? 'Recharge de crédits' : transaction.species}
                 </Typography>
                 <Typography variant="body2" color="text.secondary">
-                  — Paris {formatOrdinalFr(transaction.arrondissement)} —
+                  {transaction.itemType === 'CREDITS' ? '— Achat —' : `— Paris ${formatOrdinalFr(transaction.arrondissement)} —`}
                 </Typography>
-                <Typography variant="body2" sx={{ fontWeight: 600 }}>
-                  {formatCredits(transaction.pricePaid)}
+                <Typography variant="body2" sx={{ fontWeight: 600, color: transaction.itemType === 'CREDITS' ? 'success.main' : 'inherit' }}>
+                  {transaction.itemType === 'CREDITS' ? '+' : ''}{formatCredits(transaction.pricePaid)}
                 </Typography>
               </Stack>
             ))}
