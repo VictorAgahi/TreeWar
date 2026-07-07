@@ -12,6 +12,7 @@ import { IconButton } from '../../atoms/IconButton/IconButton';
 import { NavLinksList } from '../../molecules/NavLinksList/NavLinksList';
 import { CompanyBadge } from '../../molecules/CompanyBadge/CompanyBadge';
 import type { NavLinkItemProps } from '../../molecules/NavLinkItem/NavLinkItem';
+import { useAuth } from '../../../context/AuthContext';
 
 const NAV_LINKS: Array<Pick<NavLinkItemProps, 'to' | 'label' | 'icon'>> = [
   { to: '/', label: 'Carte', icon: <HomeIcon fontSize="small" /> },
@@ -19,15 +20,11 @@ const NAV_LINKS: Array<Pick<NavLinkItemProps, 'to' | 'label' | 'icon'>> = [
   { to: '/profile', label: 'Profil', icon: <PersonIcon fontSize="small" /> },
 ];
 
-export interface NavbarProps {
-  companyName?: string;
-  credits?: number;
-}
-
-export const Navbar: React.FC<NavbarProps> = ({ companyName = 'GreenTech Corp', credits = 4200 }) => {
+export const Navbar: React.FC = () => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
   const [mobileOpen, setMobileOpen] = useState(false);
+  const { user } = useAuth();
 
   const closeMobileMenu = () => setMobileOpen(false);
 
@@ -58,7 +55,7 @@ export const Navbar: React.FC<NavbarProps> = ({ companyName = 'GreenTech Corp', 
           ) : (
             <>
               <NavLinksList links={NAV_LINKS} direction="row" />
-              <CompanyBadge name={companyName} credits={credits} />
+              {user && <CompanyBadge name={user.username} credits={user.credits} />}
             </>
           )}
         </Toolbar>
@@ -71,9 +68,11 @@ export const Navbar: React.FC<NavbarProps> = ({ companyName = 'GreenTech Corp', 
               <CloseIcon />
             </IconButton>
           </Box>
-          <Box sx={{ mb: 2 }}>
-            <CompanyBadge name={companyName} credits={credits} />
-          </Box>
+          {user && (
+            <Box sx={{ mb: 2 }}>
+              <CompanyBadge name={user.username} credits={user.credits} />
+            </Box>
+          )}
           <Divider sx={{ mb: 2 }} />
           <NavLinksList links={NAV_LINKS} direction="column" onNavigate={closeMobileMenu} />
         </Box>
