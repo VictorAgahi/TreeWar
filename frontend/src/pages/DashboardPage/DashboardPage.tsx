@@ -1,9 +1,8 @@
-import React from 'react';
-import { Box, Container } from '@mui/material';
+import React, { useEffect, useState } from 'react';
+import { Box, Container, CircularProgress } from '@mui/material';
 import PaidIcon from '@mui/icons-material/Paid';
 import ParkIcon from '@mui/icons-material/Park';
 import AccountBalanceWalletIcon from '@mui/icons-material/AccountBalanceWallet';
-import MilitaryTechIcon from '@mui/icons-material/MilitaryTech';
 import { KpiCard } from '../../components/molecules/KpiCard/KpiCard';
 import type { KpiCardProps } from '../../components/molecules/KpiCard/KpiCard';
 import { DashboardHeader } from '../../components/organisms/DashboardHeader/DashboardHeader';
@@ -12,40 +11,136 @@ import { LeaderboardCard } from '../../components/organisms/LeaderboardCard/Lead
 import { PremiumTreeCard } from '../../components/organisms/PremiumTreeCard/PremiumTreeCard';
 import { RankProgressCard } from '../../components/organisms/RankProgressCard/RankProgressCard';
 import { RealImpactCard } from '../../components/organisms/RealImpactCard/RealImpactCard';
-import { SponsoredTreesTable } from '../../components/organisms/SponsoredTreesTable/SponsoredTreesTable';
 import { TransactionsHistory } from '../../components/organisms/TransactionsHistory/TransactionsHistory';
-import { DASHBOARD_MOCK } from '../../mocks/dashboard.mocks';
-import { formatCredits, formatNumberFr, formatOrdinalFr } from '../../utils/format';
+import { formatCredits, formatNumberFr } from '../../utils/format';
+import { useAuth } from '../../context/AuthContext';
+import { axiosClient } from '../../api/axiosClient';
+import { userApi, type LeaderboardUser } from '../../api/user.api';
+import { treeApi, type BackendTree as Tree } from '../../api/tree.api';
+import { transactionApi, type Transaction } from '../../api/transaction.api';
+
 import {
   getMostExpensiveTree,
-  getNextRankEntry,
   getRealTreesPlanted,
   getSpendingOverTime,
   getTotalInvested,
-  getTransactionHistory,
   getTreeMapLink,
 } from './dashboard.selectors';
 
-// Le backend n'expose pas encore d'endpoint dashboard : les données viennent des
-// fixtures locales, à remplacer par la future couche API (src/api).
-const dashboard = DASHBOARD_MOCK;
+type LeaderboardEntry = {
+  rank: number;
+  companyName: string;
+  totalInvested: number;
+  sponsoredTreesCount: number;
+};
 
 export const DashboardPage: React.FC = () => {
-  const { companyName, creditsRemaining, rank, totalCompanies, leaderboard, sponsoredTrees } = dashboard;
+  const { user } = useAuth();
+  const [loading, setLoading] = useState(true);
+  const [trees, setTrees] = useState<Tree[]>([]);
+  const [transactions, setTransactions] = useState<Transaction[]>([]);
+  const [leaderboardTotalValue, setLeaderboardTotalValue] = useState<LeaderboardUser[]>([]);
+  const [leaderboardMostTrees, setLeaderboardMostTrees] = useState<LeaderboardUser[]>([]);
+  const [leaderboardExpensiveTree, setLeaderboardExpensiveTree] = useState<LeaderboardUser[]>([]);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        setLoading(true);
+        const [treesRes, transactionsRes, totalValueRes, mostTreesRes, expensiveTreeRes] = await Promise.all([
+          axiosClient.request<Tree[]>(treeApi.getAll()),
+          axiosClient.request<Transaction[]>(transactionApi.getMyTransactions()),
+          axiosClient.request<LeaderboardUser[]>(userApi.getLeaderboardTotalValue()),
+          axiosClient.request<LeaderboardUser[]>(userApi.getLeaderboardMostTrees()),
+          axiosClient.request<LeaderboardUser[]>(userApi.getLeaderboardMostExpensiveTree()),
+        ]);
+
+        console.log('--- DASHBOARD DATA FETCHED ---');
+        console.log('Trees:', treesRes.data);
+        console.log('Transactions:', transactionsRes.data);
+        console.log('Leaderboard (Total Value):', totalValueRes.data);
+        console.log('Leaderboard (Most Trees):', mostTreesRes.data);
+        console.log('Leaderboard (Expensive Tree):', expensiveTreeRes.data);
+
+        setTrees(treesRes.data.filter(t => t.ownerId === user?.id));
+        setTransactions(transactionsRes.data);
+        setLeaderboardTotalValue(totalValueRes.data);
+        setLeaderboardMostTrees(mostTreesRes.data);
+        setLeaderboardExpensiveTree(expensiveTreeRes.data);
+      } catch (error) {
+        console.error('Failed to load dashboard data', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
+  }, []);
+
+  if (loading || !user) {
+    return (
+      <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
+        <CircularProgress />
+      </Box>
+    );
+  }
+
+  const companyName = user.username;
+  const creditsRemaining = user.credits;
+  
+  // Build frontend expected structures from backend data
+  const sponsoredTrees = trees.map(t => ({
+    id: t.id,
+    species: t.name,
+    arrondissement: 1,
+    pricePaid: t.price,
+    purchasedAt: new Date().toISOString(),
+    lat: t.location.coordinates[1],
+    lon: t.location.coordinates[0],
+  }));
+
+  const mappedTransactions = transactions.map(t => ({
+    id: t.id,
+    species: t.itemName,
+    arrondissement: 1, // Fallback
+    pricePaid: t.price,
+    purchasedAt: t.createdAt,
+    lat: t.lat,
+    lon: t.lng,
+  }));
 
   const totalInvested = getTotalInvested(sponsoredTrees);
   const realTreesPlanted = getRealTreesPlanted(totalInvested);
   const mostExpensiveTree = getMostExpensiveTree(sponsoredTrees);
-  const nextRankEntry = getNextRankEntry(leaderboard, rank);
-  const spendingOverTime = getSpendingOverTime(sponsoredTrees);
-  const transactions = getTransactionHistory(sponsoredTrees);
+  const spendingOverTime = getSpendingOverTime(mappedTransactions); // Pass transactions to get true spending over time
 
-  const currentLeaderboardEntry = leaderboard.find((entry) => entry.companyName === companyName) ?? {
-    rank,
-    companyName,
-    totalInvested,
-    sponsoredTreesCount: sponsoredTrees.length,
-  };
+  const parseLeaderboard = (users: LeaderboardUser[]): LeaderboardEntry[] => 
+    users.map((u, index) => ({
+      rank: index + 1,
+      companyName: u.username,
+      totalInvested: u.totalValue || 0,
+      sponsoredTreesCount: u.treeCount || 0,
+      maxTreePrice: u.maxTreePrice || 0,
+    }));
+
+  const leaderboardTV = parseLeaderboard(leaderboardTotalValue);
+  const leaderboardMT = parseLeaderboard(leaderboardMostTrees);
+  const leaderboardET = parseLeaderboard(leaderboardExpensiveTree);
+
+  // We keep rank based on total value for the KPI
+  const currentUserIndex = leaderboardTotalValue.findIndex((u) => u.id === user.id);
+  const rank = currentUserIndex !== -1 ? currentUserIndex + 1 : 0;
+  const nextRankEntry = rank > 1 ? leaderboardTV[rank - 2] : undefined;
+
+  const currentLeaderboardEntry = currentUserIndex !== -1 
+    ? leaderboardTV[currentUserIndex] 
+    : {
+        rank: 0,
+        companyName,
+        totalInvested,
+        sponsoredTreesCount: sponsoredTrees.length,
+        maxTreePrice: mostExpensiveTree?.pricePaid || 0,
+      };
 
   const kpis: KpiCardProps[] = [
     {
@@ -66,12 +161,6 @@ export const DashboardPage: React.FC = () => {
       description: 'Budget encore disponible',
       icon: <AccountBalanceWalletIcon color="primary" />,
     },
-    {
-      label: 'Rang actuel',
-      value: `${formatOrdinalFr(rank)} / ${totalCompanies}`,
-      description: 'Position dans le leaderboard des entreprises',
-      icon: <MilitaryTechIcon color="primary" />,
-    },
   ];
 
   return (
@@ -81,7 +170,7 @@ export const DashboardPage: React.FC = () => {
       <Box
         sx={{
           display: 'grid',
-          gridTemplateColumns: { xs: '1fr', sm: '1fr 1fr', md: 'repeat(4, 1fr)' },
+          gridTemplateColumns: { xs: '1fr', sm: '1fr 1fr', md: 'repeat(3, 1fr)' },
           gap: 2,
         }}
       >
@@ -92,20 +181,24 @@ export const DashboardPage: React.FC = () => {
 
       <RealImpactCard realTreesPlanted={realTreesPlanted} />
 
-      {nextRankEntry ? <RankProgressCard currentInvested={totalInvested} nextRankEntry={nextRankEntry} /> : null}
+      {nextRankEntry && rank > 0 ? <RankProgressCard currentInvested={totalInvested} nextRankEntry={nextRankEntry} /> : null}
 
-      <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', md: '5fr 7fr' }, gap: 3 }}>
-        {mostExpensiveTree ? (
+      {mostExpensiveTree ? (
+        <Box sx={{ width: { xs: '100%', md: '50%' }, alignSelf: 'center' }}>
           <PremiumTreeCard tree={mostExpensiveTree} mapLink={getTreeMapLink(mostExpensiveTree)} />
-        ) : null}
-        <LeaderboardCard topEntries={leaderboard} currentEntry={currentLeaderboardEntry} />
-      </Box>
+        </Box>
+      ) : null}
 
-      <SponsoredTreesTable trees={sponsoredTrees} getMapLink={getTreeMapLink} />
+      <LeaderboardCard 
+        topEntriesTV={leaderboardTV} 
+        topEntriesMT={leaderboardMT} 
+        topEntriesET={leaderboardET} 
+        currentEntry={currentLeaderboardEntry} 
+      />
 
       <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', md: '7fr 5fr' }, gap: 3 }}>
         <InvestmentChart points={spendingOverTime} />
-        <TransactionsHistory transactions={transactions} />
+        <TransactionsHistory transactions={mappedTransactions} />
       </Box>
     </Container>
   );

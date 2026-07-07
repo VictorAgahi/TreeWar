@@ -45,7 +45,7 @@ export const RegisterScreen: React.FC = () => {
       
       login(loginResult.accessToken);
       navigate('/dashboard');
-    } catch (err) {
+    } catch {
       // L'erreur est déjà captée par les hooks
     }
   };

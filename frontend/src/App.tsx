@@ -8,6 +8,7 @@ import { MainLayout } from './components/templates/MainLayout/MainLayout';
 import { MapPage } from './pages/MapPage/MapPage';
 import { DashboardPage } from './pages/DashboardPage/DashboardPage';
 import { ProfilePage } from './pages/ProfilePage/ProfilePage';
+import { AdminPage } from './pages/AdminPage/AdminPage';
 
 function App() {
   return (
@@ -17,6 +18,7 @@ function App() {
           <Route path="/" element={<LandingScreen />} />
           <Route path="/login" element={<LoginScreen />} />
           <Route path="/register" element={<RegisterScreen />} />
+          <Route path="/admin" element={<AdminPage />} />
 
           <Route element={<MainLayout />}>
             <Route path="map" element={<MapPage />} />

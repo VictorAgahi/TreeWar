@@ -3,7 +3,7 @@ import { Container, Stack } from '@mui/material';
 import EmojiEventsIcon from '@mui/icons-material/EmojiEvents';
 import { Card } from '../../components/atoms/Card/Card';
 import { Typography } from '../../components/atoms/Typography/Typography';
-import { ParisTreeMap } from '../../components/organisms/ParisTreeMap/ParisTreeMap';
+import { TreeWarMap } from '../../components/organisms/TreeWarMap/TreeWarMap';
 import { axiosClient } from '../../api/axiosClient';
 import { leaderboardApi } from '../../api/leaderboard.api';
 import type { LeaderboardEntry } from '../../api/leaderboard.api';
@@ -42,7 +42,7 @@ export const MapPage: React.FC = () => {
       </Stack>
 
       <Card noPadding sx={{ flex: 1, minHeight: 420, display: 'flex' }}>
-        <ParisTreeMap />
+        <TreeWarMap />
       </Card>
 
       <Card>

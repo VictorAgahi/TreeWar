@@ -36,7 +36,7 @@ export const LoginScreen: React.FC = () => {
       const result = await executeLogin({ data });
       login(result.accessToken);
       navigate('/dashboard');
-    } catch (err) {
+    } catch {
     }
   };
 

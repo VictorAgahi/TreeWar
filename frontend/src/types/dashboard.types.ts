@@ -17,6 +17,7 @@ export interface LeaderboardEntry {
   /** Montant investi en crédits. */
   totalInvested: number;
   sponsoredTreesCount: number;
+  maxTreePrice?: number;
 }
 
 export interface CompanyDashboardData {
