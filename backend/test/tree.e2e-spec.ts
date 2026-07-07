@@ -21,6 +21,7 @@ describe('Tree Module (e2e)', () => {
 
     // Clear DB
     const dataSource = app.get(DataSource);
+    await dataSource.query('DELETE FROM "transactions"');
     await dataSource.query('DELETE FROM "trees"');
     await dataSource.query('DELETE FROM "users"');
 

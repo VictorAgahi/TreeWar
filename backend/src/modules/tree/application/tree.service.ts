@@ -8,6 +8,11 @@ import { TreeRepository } from '../infrastructure/repositories/tree.repository';
 
 import { User } from '../../user/domain/entities/user.entity';
 import { Tree } from '../domain/entities/tree.entity';
+import {
+  Transaction,
+  TransactionAction,
+  TransactionItemType,
+} from '../../transaction/domain/entities/transaction.entity';
 import { randomUUID } from 'crypto';
 
 @Injectable()
@@ -82,7 +87,7 @@ export class TreeService {
         }
       } else {
         tree = queryRunner.manager.create(Tree, {
-          id: randomUUID(),
+          id: idToUse,
           name: newName || 'Nouvel Arbre',
           location: {
             type: 'Point',
@@ -97,6 +102,18 @@ export class TreeService {
 
       await queryRunner.manager.save(user);
       const updatedTree = await queryRunner.manager.save(tree);
+
+      const transaction = queryRunner.manager.create(Transaction, {
+        action: TransactionAction.BUY,
+        itemType: TransactionItemType.TREE,
+        itemId: tree.id,
+        itemName: tree.name,
+        price: amount,
+        lat,
+        lng,
+        userId: user.id,
+      });
+      await queryRunner.manager.save(transaction);
 
       await queryRunner.commitTransaction();
       return updatedTree;

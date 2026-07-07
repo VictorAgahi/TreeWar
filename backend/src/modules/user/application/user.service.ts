@@ -27,9 +27,9 @@ export class UserService {
     const salt = await bcrypt.genSalt(10);
     const passwordHash = await bcrypt.hash(registerDto.password, salt);
 
-    // Generate random username: Joueur_XyZ123
+    // Generate random username: Company_XyZ123
     const randomString = Math.random().toString(36).substring(2, 8);
-    const username = `Joueur_${randomString}`;
+    const username = `Company_${randomString}`;
 
     return this.userRepository.save({
       email: registerDto.email,

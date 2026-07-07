@@ -32,6 +32,7 @@ describe('User Module (e2e)', () => {
 
     // Clear DB to avoid test data accumulation
     const dataSource = app.get(DataSource);
+    await dataSource.query('DELETE FROM "transactions"');
     await dataSource.query('DELETE FROM "trees"');
     await dataSource.query('DELETE FROM "users"');
   });
@@ -125,7 +126,7 @@ describe('User Module (e2e)', () => {
       expect(response.status).toBe(200);
       expect(response.body).toHaveProperty('email', userEmail);
       expect(response.body).toHaveProperty('username');
-      expect(response.body.username).toMatch(/^Joueur_.+$/);
+      expect(response.body.username).toMatch(/^Company_.+$/);
       expect(response.body).toHaveProperty('credits', 3000);
     });
 
@@ -270,6 +271,7 @@ describe('User Module (e2e)', () => {
     beforeAll(async () => {
       // Clear DB to isolate this scenario
       const dataSource = app.get(DataSource);
+      await dataSource.query('DELETE FROM "transactions"');
       await dataSource.query('DELETE FROM "trees"');
       await dataSource.query('DELETE FROM "users"');
 
@@ -325,7 +327,6 @@ describe('User Module (e2e)', () => {
       expect(response.status).toBe(200);
       
       const ranks = response.body.map((u: LeaderboardUser) => u.username);
-      console.log('TOTAL VALUE:', response.body);
       // Order should be u0 (2600) > u2 (2500) > u3 (2000) > u1 (1500)
       expect(ranks.indexOf(users[0].username)).toBeLessThan(ranks.indexOf(users[2].username));
       expect(ranks.indexOf(users[2].username)).toBeLessThan(ranks.indexOf(users[3].username));
