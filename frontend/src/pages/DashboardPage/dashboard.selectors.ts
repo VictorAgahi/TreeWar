@@ -20,17 +20,12 @@ export const getMostExpensiveTree = (trees: SponsoredTree[]): SponsoredTree | un
 
 /** Cumul des investissements par jour d'achat, en ordre chronologique. */
 export const getSpendingOverTime = (trees: SponsoredTree[]): SpendingPoint[] => {
-  const spentByDate = new Map<string, number>();
   const sortedByDate = [...trees].sort((a, b) => a.purchasedAt.localeCompare(b.purchasedAt));
 
-  for (const tree of sortedByDate) {
-    spentByDate.set(tree.purchasedAt, (spentByDate.get(tree.purchasedAt) ?? 0) + tree.pricePaid);
-  }
-
   let cumulativeSpent = 0;
-  return Array.from(spentByDate.entries()).map(([isoDate, spent]) => {
-    cumulativeSpent += spent;
-    return { date: formatDateFr(isoDate).slice(0, 5), cumulativeSpent };
+  return sortedByDate.map((tree) => {
+    cumulativeSpent += tree.pricePaid;
+    return { date: formatDateFr(tree.purchasedAt).slice(0, 5), cumulativeSpent };
   });
 };
 

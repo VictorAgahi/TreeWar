@@ -60,6 +60,7 @@ export function mergeTreeSponsorships(trees: ParisTree[], backendTrees: BackendT
         customName: match.name,
         dbTreeId: match.id,
         currentPrice: match.price,
+        ownerId: match.ownerId ?? undefined,
       },
     };
   });

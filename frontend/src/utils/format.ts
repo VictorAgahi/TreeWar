@@ -4,7 +4,10 @@ export const formatCredits = (value: number): string => `${formatNumberFr(value)
 
 /** `YYYY-MM-DD` → `JJ/MM/AAAA`, sans dépendre du fuseau horaire du navigateur. */
 export const formatDateFr = (isoDate: string): string => {
-  const [year, month, day] = isoDate.split('-');
+  const datePart = isoDate.split('T')[0] || '';
+  const parts = datePart.split('-');
+  if (parts.length !== 3) return isoDate;
+  const [year, month, day] = parts;
   return `${day}/${month}/${year}`;
 };
 

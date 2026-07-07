@@ -68,6 +68,7 @@ export interface TreeSponsorship {
   customName?: string;
   dbTreeId?: string;
   currentPrice?: number;
+  ownerId?: string;
 }
 
 export interface ParisTree {

@@ -52,7 +52,7 @@ export const PremiumTreeCard: React.FC<PremiumTreeCardProps> = ({ tree, mapLink 
               Paris {formatOrdinalFr(tree.arrondissement)} arrondissement
             </Typography>
             <Typography variant="body2" color="text.secondary">
-              Acheté le {formatDateFr(tree.purchasedAt)}
+              Parrainé le {formatDateFr(tree.purchasedAt)}
             </Typography>
           </Stack>
         </Stack>

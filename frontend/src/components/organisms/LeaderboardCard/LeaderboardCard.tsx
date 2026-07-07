@@ -30,8 +30,8 @@ export const LeaderboardCard: React.FC<LeaderboardCardProps> = ({ topEntriesTV, 
   const renderRow = (entry: LeaderboardEntry) => {
     const isCurrent = entry.companyName === currentEntry.companyName;
     return (
-      <TableRow key={entry.rank} sx={isCurrent ? highlightSx : undefined}>
-        <TableCell sx={{ fontWeight: isCurrent ? 700 : 400 }}>{entry.rank}</TableCell>
+      <TableRow key={entry.companyName} sx={isCurrent ? highlightSx : undefined}>
+        <TableCell sx={{ fontWeight: isCurrent ? 700 : 400 }}>{entry.rank > 0 ? entry.rank : '-'}</TableCell>
         <TableCell sx={{ fontWeight: isCurrent ? 700 : 400 }}>
           {entry.companyName}
           {isCurrent ? <Chip label="Vous" color="primary" size="small" sx={{ ml: 1 }} /> : null}

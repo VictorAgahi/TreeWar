@@ -48,7 +48,7 @@ export const AdminPage: React.FC = () => {
           Générateur de Monde (Seed)
         </Typography>
         <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-          Cet outil permet de générer de faux profils (Takima, Google, etc.), de leur attribuer des crédits et de simuler des achats d&apos;arbres à travers Paris pour rendre le classement réaliste.
+          Cet outil permet de générer de faux profils (Takima, Google, etc.), de leur attribuer des crédits et de simuler des parrainages d&apos;arbres à travers Paris pour rendre le classement réaliste.
         </Typography>
         
         <Alert severity="warning" icon={<WarningIcon />} sx={{ mb: 3 }}>
