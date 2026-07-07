@@ -48,7 +48,7 @@ export const ParisTreeMap: React.FC = () => {
   }, []);
 
   return (
-    <div style={{ position: 'fixed', inset: 0 }}>
+    <div style={{ position: 'relative', flex: 1, width: '100%', display: 'flex', borderRadius: 16, overflow: 'hidden' }}>
       <MapContainer center={PARIS_CENTER} zoom={DEFAULT_ZOOM} preferCanvas style={{ height: '100%', width: '100%' }}>
         <TileLayer
           attribution="&copy; OpenStreetMap contributors"
@@ -80,7 +80,10 @@ export const ParisTreeMap: React.FC = () => {
         </Alert>
       )}
 
-      <Backdrop open={isLoading} sx={{ zIndex: 2000, flexDirection: 'column', gap: 2 }}>
+      <Backdrop
+        open={isLoading}
+        sx={{ position: 'absolute', zIndex: 2000, flexDirection: 'column', gap: 2, borderRadius: 4 }}
+      >
         <CircularProgress color="inherit" />
         <Typography sx={{ color: 'white' }}>
           Chargement des arbres de Paris… {loadProgress.loaded}/{loadProgress.total || '…'}

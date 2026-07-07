@@ -7,7 +7,6 @@ import { MainLayout } from './components/templates/MainLayout/MainLayout';
 import { HomePage } from './pages/HomePage/HomePage';
 import { DashboardPage } from './pages/DashboardPage/DashboardPage';
 import { ProfilePage } from './pages/ProfilePage/ProfilePage';
-import { ParisTreeMap } from './components/organisms/ParisTreeMap/ParisTreeMap';
 
 function App() {
   return (
@@ -19,7 +18,6 @@ function App() {
 
           <Route element={<MainLayout />}>
             <Route index element={<HomePage />} />
-            <Route path="map" element={<ParisTreeMap />} />
             <Route element={<ProtectedRoute />}>
               <Route path="dashboard" element={<DashboardPage />} />
               <Route path="profile" element={<ProfilePage />} />
