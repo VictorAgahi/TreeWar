@@ -11,13 +11,17 @@ export class TreeRepository {
   ) {}
 
   async findAll(): Promise<Tree[]> {
-    return this.repository.find({ relations: { owner: true } });
+    return this.repository.find({
+      relations: { owner: true },
+      select: { owner: { id: true, username: true } },
+    });
   }
 
   async findById(id: string): Promise<Tree | null> {
     return this.repository.findOne({
       where: { id },
       relations: { owner: true },
+      select: { owner: { id: true, username: true } },
     });
   }
 
@@ -30,6 +34,7 @@ export class TreeRepository {
     return this.repository.find({
       where: { ownerId },
       relations: { owner: true },
+      select: { owner: { id: true, username: true } },
     });
   }
 }

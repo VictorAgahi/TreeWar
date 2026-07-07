@@ -63,10 +63,12 @@ export class TreeService {
         throw new BadRequestException('Fonds insuffisants.');
       }
 
-      let tree = await queryRunner.manager.findOne(Tree, {
-        where: { id: idToUse },
-        lock: { mode: 'pessimistic_write' },
-      });
+      let tree = idToUse
+        ? await queryRunner.manager.findOne(Tree, {
+            where: { id: idToUse },
+            lock: { mode: 'pessimistic_write' },
+          })
+        : null;
 
       if (tree) {
         if (amount <= tree.price) {
