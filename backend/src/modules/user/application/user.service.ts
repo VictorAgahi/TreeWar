@@ -27,9 +27,14 @@ export class UserService {
     const salt = await bcrypt.genSalt(10);
     const passwordHash = await bcrypt.hash(registerDto.password, salt);
 
+    // Generate random username: Joueur_XyZ123
+    const randomString = Math.random().toString(36).substring(2, 8);
+    const username = `Joueur_${randomString}`;
+
     return this.userRepository.save({
       email: registerDto.email,
       passwordHash,
+      username,
     });
   }
 
@@ -49,5 +54,35 @@ export class UserService {
 
     const payload = { sub: user.id, email: user.email };
     return this.jwtService.signAsync(payload);
+  }
+
+  async getUserById(id: string) {
+    const user = await this.userRepository.findById(id);
+    if (!user) {
+      throw new UnauthorizedException('Utilisateur non trouvé.');
+    }
+    // Ne pas renvoyer le hash du mot de passe
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const { passwordHash, ...result } = user;
+    return result;
+  }
+
+  async updateUsername(id: string, newUsername: string) {
+    const existing = await this.userRepository.findByUsername(newUsername);
+    if (existing && existing.id !== id) {
+      throw new ConflictException('Ce pseudo est déjà utilisé.');
+    }
+
+    const user = await this.userRepository.findById(id);
+    if (!user) {
+      throw new UnauthorizedException('Utilisateur non trouvé.');
+    }
+
+    user.username = newUsername;
+    await this.userRepository.save(user);
+
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const { passwordHash, ...result } = user;
+    return result;
   }
 }

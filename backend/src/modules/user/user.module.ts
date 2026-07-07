@@ -7,6 +7,7 @@ import { User } from './domain/entities/user.entity';
 import { UserRepository } from './infrastructure/repositories/user.repository';
 import { UserService } from './application/user.service';
 import { UserController } from './presentation/controllers/user.controller';
+import { JwtStrategy } from '../../common/strategies/jwt.strategy';
 
 const privateKey = fs.readFileSync(
   path.join(process.cwd(), 'keys/private.pem'),
@@ -33,7 +34,7 @@ const publicKey = fs.readFileSync(
     }),
   ],
   controllers: [UserController],
-  providers: [UserRepository, UserService],
+  providers: [UserRepository, UserService, JwtStrategy],
   exports: [UserService],
 })
 export class UserModule {}

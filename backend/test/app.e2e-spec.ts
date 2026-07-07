@@ -7,6 +7,7 @@ import { AppModule } from './../src/app.module';
 describe('User Module (e2e)', () => {
   let app: INestApplication<App>;
   let userEmail: string;
+  let accessToken: string;
   const userPassword = 'password123';
 
   beforeAll(async () => {
@@ -80,6 +81,7 @@ describe('User Module (e2e)', () => {
       expect(response.status).toBe(200);
       expect(response.body).toHaveProperty('accessToken');
       expect(typeof response.body.accessToken).toBe('string');
+      accessToken = response.body.accessToken;
     });
 
     it('should fail to login with wrong password', async () => {
@@ -96,6 +98,65 @@ describe('User Module (e2e)', () => {
 
       // Assert
       expect(response.status).toBe(401);
+    });
+  });
+
+  describe('/user/me (GET)', () => {
+    it('should get current user profile with valid token', async () => {
+      // Act
+      const response = await request(app.getHttpServer())
+        .get('/user/me')
+        .set('Authorization', `Bearer ${accessToken}`);
+
+      // Assert
+      expect(response.status).toBe(200);
+      expect(response.body).toHaveProperty('email', userEmail);
+      expect(response.body).toHaveProperty('username');
+      expect(response.body.username).toMatch(/^Joueur_.+$/);
+    });
+
+    it('should reject if no token provided', async () => {
+      // Act
+      const response = await request(app.getHttpServer()).get('/user/me');
+
+      // Assert
+      expect(response.status).toBe(401);
+    });
+  });
+
+  describe('/user/username (PATCH)', () => {
+    it('should update username with valid payload', async () => {
+      // Arrange
+      const newUsername = `NewPseudo${Math.random().toString(36).substring(2, 6)}`;
+      const updatePayload = {
+        username: newUsername,
+      };
+
+      // Act
+      const response = await request(app.getHttpServer())
+        .patch('/user/username')
+        .set('Authorization', `Bearer ${accessToken}`)
+        .send(updatePayload);
+
+      // Assert
+      expect(response.status).toBe(200);
+      expect(response.body).toHaveProperty('username', newUsername);
+    });
+
+    it('should reject invalid username', async () => {
+      // Arrange
+      const updatePayload = {
+        username: 'a', // Trop court
+      };
+
+      // Act
+      const response = await request(app.getHttpServer())
+        .patch('/user/username')
+        .set('Authorization', `Bearer ${accessToken}`)
+        .send(updatePayload);
+
+      // Assert
+      expect(response.status).toBe(400); // Bad Request (ValidationPipe)
     });
   });
 });
