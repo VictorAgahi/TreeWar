@@ -1,0 +1,31 @@
+import React from 'react';
+import { Box, Stack } from '@mui/material';
+import { Card } from '../../atoms/Card/Card';
+import { Typography } from '../../atoms/Typography/Typography';
+import { TREE_MARKER_COLORS } from '../../organisms/ParisTreeMap/treeMarkerColors';
+
+export const MapLegend: React.FC = () => {
+  return (
+    <Card
+      sx={{
+        position: 'absolute',
+        bottom: 16,
+        left: 16,
+        zIndex: 1000,
+        px: 2,
+        py: 1.5,
+      }}
+    >
+      <Stack spacing={0.75}>
+        <Stack direction="row" spacing={1} sx={{ alignItems: 'center' }}>
+          <Box sx={{ width: 12, height: 12, borderRadius: '50%', bgcolor: TREE_MARKER_COLORS.available }} />
+          <Typography variant="body2">Disponible au parrainage</Typography>
+        </Stack>
+        <Stack direction="row" spacing={1} sx={{ alignItems: 'center' }}>
+          <Box sx={{ width: 12, height: 12, borderRadius: '50%', bgcolor: TREE_MARKER_COLORS.sponsored }} />
+          <Typography variant="body2">Déjà parrainé</Typography>
+        </Stack>
+      </Stack>
+    </Card>
+  );
+};
