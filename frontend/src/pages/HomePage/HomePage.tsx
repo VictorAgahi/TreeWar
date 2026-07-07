@@ -1,11 +1,35 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Container, Stack } from '@mui/material';
 import EmojiEventsIcon from '@mui/icons-material/EmojiEvents';
 import { Card } from '../../components/atoms/Card/Card';
 import { Typography } from '../../components/atoms/Typography/Typography';
 import { ParisTreeMap } from '../../components/organisms/ParisTreeMap/ParisTreeMap';
+import { axiosClient } from '../../api/axiosClient';
+import { leaderboardApi } from '../../api/leaderboard.api';
+import type { LeaderboardEntry } from '../../api/leaderboard.api';
 
 export const HomePage: React.FC = () => {
+  const [leaderboard, setLeaderboard] = useState<LeaderboardEntry[]>([]);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    axiosClient
+      .request<LeaderboardEntry[]>(leaderboardApi.totalValue())
+      .then((result) => {
+        if (!cancelled) {
+          setLeaderboard(result.data.filter((entry) => entry.totalValue > 0));
+        }
+      })
+      .catch(() => {
+        // Leaderboard is a nice-to-have on this page; a failed fetch just keeps the empty state.
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
   return (
     <Container maxWidth="lg" sx={{ py: 4, flex: 1, display: 'flex', flexDirection: 'column', gap: 3 }}>
       <Stack spacing={1}>
@@ -26,9 +50,24 @@ export const HomePage: React.FC = () => {
           <EmojiEventsIcon color="primary" />
           <Typography variant="h6">Top du classement</Typography>
         </Stack>
-        <Typography variant="body2" color="text.secondary">
-          Aucune entreprise n'a encore parrainé d'arbre. Soyez la première !
-        </Typography>
+        {leaderboard.length === 0 ? (
+          <Typography variant="body2" color="text.secondary">
+            Aucune entreprise n'a encore parrainé d'arbre. Soyez la première !
+          </Typography>
+        ) : (
+          <Stack spacing={1.5}>
+            {leaderboard.map((entry, index) => (
+              <Stack key={entry.id} direction="row" sx={{ justifyContent: 'space-between', alignItems: 'center' }}>
+                <Typography variant="body2" sx={{ fontWeight: 600 }}>
+                  #{index + 1} {entry.username}
+                </Typography>
+                <Typography variant="body2" color="text.secondary">
+                  {entry.totalValue} crédits
+                </Typography>
+              </Stack>
+            ))}
+          </Stack>
+        )}
       </Card>
     </Container>
   );

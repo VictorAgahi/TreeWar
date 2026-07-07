@@ -5,30 +5,54 @@ import { Typography } from '../../atoms/Typography/Typography';
 import { TreeInfoPanel } from '../../molecules/TreeInfoPanel/TreeInfoPanel';
 import { MapLegend } from '../../molecules/MapLegend/MapLegend';
 import { fetchAllParisTrees } from '../../../api/parisTreesApi';
+import { axiosClient } from '../../../api/axiosClient';
+import { treeApi, mergeTreeSponsorships } from '../../../api/tree.api';
+import type { BackendTree } from '../../../api/tree.api';
+import { useApi } from '../../../hooks/useApi';
+import { useAuth } from '../../../context/AuthContext';
 import type { ParisTree } from '../../../types/tree';
 import { TREE_MARKER_COLORS } from './treeMarkerColors';
 
 const PARIS_CENTER: [number, number] = [48.8566, 2.3522];
 const DEFAULT_ZOOM = 12;
 
+function markerColor(tree: ParisTree): string {
+  if (tree.remarkable) return TREE_MARKER_COLORS.remarkable;
+  if (tree.sponsorship.status === 'sponsored') return TREE_MARKER_COLORS.sponsored;
+  return TREE_MARKER_COLORS.normal;
+}
+
 export const ParisTreeMap: React.FC = () => {
-  const [trees, setTrees] = useState<ParisTree[]>([]);
+  const { isAuthenticated } = useAuth();
+  const [openDataTrees, setOpenDataTrees] = useState<ParisTree[]>([]);
+  const [backendTrees, setBackendTrees] = useState<BackendTree[]>([]);
   const [loadProgress, setLoadProgress] = useState({ loaded: 0, total: 0 });
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [selectedTree, setSelectedTree] = useState<ParisTree | null>(null);
+  const [selectedTreeId, setSelectedTreeId] = useState<string | null>(null);
+
+  // GET /tree is public and needs no auth header, so we call axiosClient directly
+  // rather than useApi — useApi's config object is recreated every render, which
+  // would make it unsafe as a useEffect dependency.
+  const refreshBackendTrees = useCallback(async () => {
+    const result = await axiosClient.request<BackendTree[]>(treeApi.getAll());
+    setBackendTrees(result.data);
+  }, []);
 
   useEffect(() => {
     let cancelled = false;
 
-    fetchAllParisTrees((loaded, total) => {
-      if (!cancelled) {
-        setLoadProgress({ loaded, total });
-      }
-    })
-      .then((result) => {
+    Promise.all([
+      fetchAllParisTrees((loaded, total) => {
         if (!cancelled) {
-          setTrees(result);
+          setLoadProgress({ loaded, total });
+        }
+      }),
+      refreshBackendTrees(),
+    ])
+      .then(([openData]) => {
+        if (!cancelled) {
+          setOpenDataTrees(openData);
         }
       })
       .catch(() => {
@@ -45,9 +69,46 @@ export const ParisTreeMap: React.FC = () => {
     return () => {
       cancelled = true;
     };
-  }, []);
+  }, [refreshBackendTrees]);
 
-  const handleSelect = useCallback((tree: ParisTree) => setSelectedTree(tree), []);
+  const trees = useMemo(
+    () => mergeTreeSponsorships(openDataTrees, backendTrees),
+    [openDataTrees, backendTrees],
+  );
+
+  const selectedTree = useMemo(
+    () => trees.find((tree) => tree.id === selectedTreeId) ?? null,
+    [trees, selectedTreeId],
+  );
+
+  const {
+    execute: executeBuyTree,
+    loading: isSponsoring,
+    error: sponsorError,
+  } = useApi<BackendTree>(treeApi.buy());
+
+  const handleSponsor = useCallback(
+    async (amount: number, customName: string) => {
+      if (!selectedTree) return;
+      try {
+        await executeBuyTree({
+          data: {
+            treeId: selectedTree.sponsorship.dbTreeId,
+            amount,
+            newName: customName || undefined,
+            lat: selectedTree.lat,
+            lng: selectedTree.lon,
+          },
+        });
+        await refreshBackendTrees();
+      } catch {
+        // surfaced to the user via sponsorError from useApi
+      }
+    },
+    [selectedTree, executeBuyTree, refreshBackendTrees],
+  );
+
+  const handleSelect = useCallback((tree: ParisTree) => setSelectedTreeId(tree.id), []);
 
   // ~1950 markers is comfortable for Leaflet's canvas renderer, but recreating that
   // many CircleMarker elements on every click (selectedTree change) is wasted work —
@@ -55,7 +116,7 @@ export const ParisTreeMap: React.FC = () => {
   const markers = useMemo(
     () =>
       trees.map((tree) => {
-        const color = tree.remarkable ? TREE_MARKER_COLORS.remarkable : TREE_MARKER_COLORS.normal;
+        const color = markerColor(tree);
         return (
           <CircleMarker
             key={tree.id}
@@ -86,7 +147,16 @@ export const ParisTreeMap: React.FC = () => {
 
       <MapLegend />
 
-      {selectedTree && <TreeInfoPanel tree={selectedTree} onClose={() => setSelectedTree(null)} />}
+      {selectedTree && (
+        <TreeInfoPanel
+          tree={selectedTree}
+          onClose={() => setSelectedTreeId(null)}
+          canSponsor={isAuthenticated}
+          isSponsoring={isSponsoring}
+          sponsorError={sponsorError}
+          onSponsor={handleSponsor}
+        />
+      )}
 
       {error && (
         <Alert severity="error" sx={{ position: 'absolute', top: 16, left: 16, zIndex: 1000 }}>

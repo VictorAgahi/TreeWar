@@ -22,6 +22,10 @@ export const MapLegend: React.FC = () => {
           <Typography variant="body2">Arbre disponible au parrainage</Typography>
         </Stack>
         <Stack direction="row" spacing={1} sx={{ alignItems: 'center' }}>
+          <Box sx={{ width: 12, height: 12, borderRadius: '50%', bgcolor: TREE_MARKER_COLORS.sponsored }} />
+          <Typography variant="body2">Arbre parrainé</Typography>
+        </Stack>
+        <Stack direction="row" spacing={1} sx={{ alignItems: 'center' }}>
           <Box
             sx={{
               width: 14,

@@ -58,13 +58,16 @@ export interface RemarkableTreeInfo {
 
 export type TreeSponsorshipStatus = 'available' | 'sponsored';
 
-// Shape expected from the future backend sponsorship endpoint (see TreeSponsorship
-// entity discussion): a tree is 'available' until a company sponsors it and gives it
-// a custom name.
+// Populated by matching this open-data tree's coordinates against the backend's
+// `GET /tree` (see api/tree.api.ts). A tree is 'available' until a company sponsors
+// it (POST /tree/buy) and gives it a custom name. `dbTreeId`/`currentPrice` are only
+// set once sponsored — needed to place a higher bid via the same endpoint.
 export interface TreeSponsorship {
   status: TreeSponsorshipStatus;
   companyName?: string;
   customName?: string;
+  dbTreeId?: string;
+  currentPrice?: number;
 }
 
 export interface ParisTree {

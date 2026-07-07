@@ -1,20 +1,35 @@
 import React from 'react';
 import { Box, Chip, IconButton, Stack } from '@mui/material';
+import { Link } from 'react-router-dom';
 import CloseIcon from '@mui/icons-material/Close';
 import ParkIcon from '@mui/icons-material/Park';
 import AutoAwesomeIcon from '@mui/icons-material/AutoAwesome';
 import { Card } from '../../atoms/Card/Card';
 import { Typography } from '../../atoms/Typography/Typography';
 import { TreeStatusBadge } from '../../atoms/TreeStatusBadge/TreeStatusBadge';
+import { SponsorTreeForm } from '../SponsorTreeForm/SponsorTreeForm';
 import type { ParisTree } from '../../../types/tree';
 
 export interface TreeInfoPanelProps {
   tree: ParisTree;
   onClose: () => void;
+  canSponsor: boolean;
+  isSponsoring: boolean;
+  sponsorError?: string | null;
+  onSponsor: (amount: number, customName: string) => void;
 }
 
-export const TreeInfoPanel: React.FC<TreeInfoPanelProps> = ({ tree, onClose }) => {
-  const { remarkable } = tree;
+export const TreeInfoPanel: React.FC<TreeInfoPanelProps> = ({
+  tree,
+  onClose,
+  canSponsor,
+  isSponsoring,
+  sponsorError,
+  onSponsor,
+}) => {
+  const { remarkable, sponsorship } = tree;
+  const isSponsored = sponsorship.status === 'sponsored';
+  const minAmount = isSponsored ? (sponsorship.currentPrice ?? 0) + 1 : 1;
 
   return (
     <Card
@@ -90,7 +105,24 @@ export const TreeInfoPanel: React.FC<TreeInfoPanelProps> = ({ tree, onClose }) =
             <Typography variant="body2">Circonférence : {tree.circumferenceCm} cm</Typography>
           )}
           {tree.developmentStage && <Typography variant="body2">Stade : {tree.developmentStage}</Typography>}
+          {isSponsored && (
+            <Typography variant="body2">Enchère actuelle : {sponsorship.currentPrice} crédits</Typography>
+          )}
         </Stack>
+
+        {canSponsor ? (
+          <SponsorTreeForm
+            minAmount={minAmount}
+            isOutbid={isSponsored}
+            isSubmitting={isSponsoring}
+            errorMessage={sponsorError}
+            onSubmit={onSponsor}
+          />
+        ) : (
+          <Typography variant="body2" sx={{ mt: 1.5 }}>
+            <Link to="/login">Connectez-vous</Link> pour {isSponsored ? 'surenchérir sur' : 'parrainer'} cet arbre.
+          </Typography>
+        )}
       </Box>
     </Card>
   );
