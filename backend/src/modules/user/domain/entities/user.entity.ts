@@ -1,4 +1,5 @@
-import { Entity, Column, PrimaryGeneratedColumn } from 'typeorm';
+import { Entity, Column, PrimaryGeneratedColumn, OneToMany } from 'typeorm';
+import { Tree } from '../../../../modules/tree/domain/entities/tree.entity';
 
 @Entity('users')
 export class User {
@@ -13,4 +14,10 @@ export class User {
 
   @Column()
   passwordHash!: string;
+
+  @Column({ type: 'int', default: 3000 })
+  credits!: number;
+
+  @OneToMany(() => Tree, (tree) => tree.owner)
+  trees!: Tree[];
 }

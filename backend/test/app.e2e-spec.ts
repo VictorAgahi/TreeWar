@@ -113,6 +113,7 @@ describe('User Module (e2e)', () => {
       expect(response.body).toHaveProperty('email', userEmail);
       expect(response.body).toHaveProperty('username');
       expect(response.body.username).toMatch(/^Joueur_.+$/);
+      expect(response.body).toHaveProperty('credits', 3000);
     });
 
     it('should reject if no token provided', async () => {
