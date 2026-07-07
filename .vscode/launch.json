@@ -1,0 +1,29 @@
+{
+  "version": "0.2.0",
+  "compounds": [
+    {
+      "name": "Launch TreeWar (All)",
+      "configurations": ["Backend (NestJS)", "Frontend (Vite)"]
+    }
+  ],
+  "configurations": [
+    {
+      "name": "Backend (NestJS)",
+      "type": "node",
+      "request": "launch",
+      "cwd": "${workspaceFolder}/backend",
+      "runtimeExecutable": "yarn",
+      "runtimeArgs": ["start:dev"],
+      "console": "integratedTerminal"
+    },
+    {
+      "name": "Frontend (Vite)",
+      "type": "node",
+      "request": "launch",
+      "cwd": "${workspaceFolder}/frontend",
+      "runtimeExecutable": "yarn",
+      "runtimeArgs": ["dev"],
+      "console": "integratedTerminal"
+    }
+  ]
+}
