@@ -5,12 +5,6 @@ import { Card } from '../../components/atoms/Card/Card';
 import { Typography } from '../../components/atoms/Typography/Typography';
 import { ParisTreeMap } from '../../components/organisms/ParisTreeMap/ParisTreeMap';
 
-const LEADERBOARD_PREVIEW = [
-  { rank: 1, company: 'EcoBank', trees: 42 },
-  { rank: 2, company: 'GreenTech Corp', trees: 31 },
-  { rank: 3, company: 'Ville Verte SA', trees: 28 },
-];
-
 export const HomePage: React.FC = () => {
   return (
     <Container maxWidth="lg" sx={{ py: 4, flex: 1, display: 'flex', flexDirection: 'column', gap: 3 }}>
@@ -32,18 +26,9 @@ export const HomePage: React.FC = () => {
           <EmojiEventsIcon color="primary" />
           <Typography variant="h6">Top du classement</Typography>
         </Stack>
-        <Stack spacing={1.5}>
-          {LEADERBOARD_PREVIEW.map((entry) => (
-            <Stack key={entry.rank} direction="row" sx={{ justifyContent: 'space-between', alignItems: 'center' }}>
-              <Typography variant="body2" sx={{ fontWeight: 600 }}>
-                #{entry.rank} {entry.company}
-              </Typography>
-              <Typography variant="body2" color="text.secondary">
-                {entry.trees} arbres
-              </Typography>
-            </Stack>
-          ))}
-        </Stack>
+        <Typography variant="body2" color="text.secondary">
+          Aucune entreprise n'a encore parrainé d'arbre. Soyez la première !
+        </Typography>
       </Card>
     </Container>
   );

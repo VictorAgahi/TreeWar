@@ -13,20 +13,62 @@ export interface ParisTreeApiRecord {
   geo_point_2d: { lon: number; lat: number } | null;
 }
 
-export interface ParisTreeApiResponse {
+// "arbresremarquablesparis" dataset: a separate, curated list of Paris's named/storied
+// trees (mostly disjoint from "les-arbres" — see RemarkableTreeInfo below).
+export interface RemarkableTreeApiRecord {
+  geom_x_y: { lon: number; lat: number } | null;
+  arbres_idbase: number | null;
+  arbres_arrondissement: string | null;
+  arbres_adresse: string | null;
+  arbres_circonferenceencm: number | null;
+  arbres_hauteurenm: number | null;
+  arbres_stadedeveloppement: string | null;
+  arbres_genre: string | null;
+  arbres_espece: string | null;
+  arbres_libellefrancais: string | null;
+  com_adresse: string | null;
+  com_arrondissement: string | null;
+  com_site: string | null;
+  com_nom_usuel: string | null;
+  com_annee_plantation: string | null;
+  com_qualification_rem: string | null;
+  com_resume: string | null;
+  com_descriptif: string | null;
+  com_label_arbres: string | null;
+  com_url_photo1: string | null;
+  com_copyright1: string | null;
+}
+
+export interface ApiPage<T> {
   total_count: number;
-  results: ParisTreeApiRecord[];
+  results: T[];
+}
+
+export interface RemarkableTreeInfo {
+  usualName: string | null;
+  site: string | null;
+  qualification: string | null;
+  summary: string | null;
+  description: string | null;
+  label: string | null;
+  photoUrl: string | null;
+  photoCredit: string | null;
+  plantedYear: string | null;
 }
 
 export type TreeSponsorshipStatus = 'available' | 'sponsored';
 
+// Shape expected from the future backend sponsorship endpoint (see TreeSponsorship
+// entity discussion): a tree is 'available' until a company sponsors it and gives it
+// a custom name.
 export interface TreeSponsorship {
   status: TreeSponsorshipStatus;
-  sponsorName?: string;
+  companyName?: string;
+  customName?: string;
 }
 
 export interface ParisTree {
-  id: number;
+  id: string;
   name: string;
   genus: string | null;
   species: string | null;
@@ -35,8 +77,8 @@ export interface ParisTree {
   heightM: number | null;
   circumferenceCm: number | null;
   developmentStage: string | null;
-  remarkable: boolean;
   lat: number;
   lon: number;
+  remarkable: RemarkableTreeInfo | null;
   sponsorship: TreeSponsorship;
 }

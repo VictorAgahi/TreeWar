@@ -10,14 +10,10 @@ export interface TreeStatusBadgeProps {
 
 export const TreeStatusBadge: React.FC<TreeStatusBadgeProps> = ({ sponsorship }) => {
   if (sponsorship.status === 'sponsored') {
-    return (
-      <Chip
-        icon={<VerifiedIcon />}
-        label={`Parrainé par ${sponsorship.sponsorName}`}
-        color="secondary"
-        size="small"
-      />
-    );
+    const label = sponsorship.customName
+      ? `"${sponsorship.customName}" — parrainé par ${sponsorship.companyName}`
+      : `Parrainé par ${sponsorship.companyName}`;
+    return <Chip icon={<VerifiedIcon />} label={label} color="secondary" size="small" />;
   }
 
   return <Chip icon={<ParkIcon />} label="Disponible au parrainage" color="primary" size="small" />;
