@@ -1,31 +1,45 @@
-import React, { useEffect, useState, useCallback } from 'react';
+import React, { useEffect, useState, useCallback, useRef } from 'react';
 import { MapContainer, TileLayer, CircleMarker } from 'react-leaflet';
-import { Backdrop, CircularProgress, Alert } from '@mui/material';
+import type { Map as LeafletMap } from 'leaflet';
+import { Backdrop, CircularProgress, Alert, Box, Autocomplete, TextField } from '@mui/material';
 import { Typography } from '../../atoms/Typography/Typography';
 import { TreeWarInfoPanel } from '../../molecules/TreeWarInfoPanel/TreeWarInfoPanel';
 import { MapLegend } from '../../molecules/MapLegend/MapLegend';
 import { axiosClient } from '../../../api/axiosClient';
-import { treeApi } from '../../../api/tree.api';
-import type { BackendTree as Tree } from '../../../api/tree.api';
+import type { ParisTree } from '../../../types/tree';
+import { fetchAllParisTrees } from '../../../api/parisTreesApi';
+import { mergeTreeSponsorships, treeApi } from '../../../api/tree.api';
+import type { BackendTree } from '../../../api/tree.api';
 import { TREE_MARKER_COLORS } from '../ParisTreeMap/treeMarkerColors';
 
 const PARIS_CENTER: [number, number] = [48.8566, 2.3522];
 const DEFAULT_ZOOM = 12;
 
 export const TreeWarMap: React.FC = () => {
-  const [trees, setTrees] = useState<Tree[]>([]);
+  const mapRef = useRef<LeafletMap | null>(null);
+  const [trees, setTrees] = useState<ParisTree[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [progressMsg, setProgressMsg] = useState<string>('Chargement des arbres du serveur...');
   const [error, setError] = useState<string | null>(null);
-  const [selectedTree, setSelectedTree] = useState<Tree | null>(null);
+  const [selectedTree, setSelectedTree] = useState<ParisTree | null>(null);
 
   const fetchTrees = useCallback(async () => {
     try {
       setIsLoading(true);
       setError(null);
-      const res = await axiosClient.request<Tree[]>(treeApi.getAll());
-      setTrees(res.data);
+      setProgressMsg('Chargement des données de la ville de Paris...');
+      
+      const openDataTrees = await fetchAllParisTrees((loaded, total) => {
+        setProgressMsg(`Chargement des arbres : ${loaded} / ${total}`);
+      });
+      
+      setProgressMsg('Synchronisation avec les données du jeu...');
+      const res = await axiosClient.request<BackendTree[]>(treeApi.getAll());
+      
+      const merged = mergeTreeSponsorships(openDataTrees, res.data);
+      setTrees(merged);
     } catch {
-      setError("Impossible de charger les arbres depuis le serveur.");
+      setError("Impossible de charger les arbres.");
     } finally {
       setIsLoading(false);
     }
@@ -36,29 +50,41 @@ export const TreeWarMap: React.FC = () => {
   }, [fetchTrees]);
 
   const handleBuySuccess = () => {
-    // Refresh trees and hide panel to force user to re-click if they want to buy again
-    // Or we could update local state for the selected tree.
     setSelectedTree(null);
     fetchTrees();
   };
 
   return (
     <div style={{ position: 'relative', flex: 1, width: '100%', display: 'flex', borderRadius: 16, overflow: 'hidden' }}>
-      <MapContainer center={PARIS_CENTER} zoom={DEFAULT_ZOOM} preferCanvas style={{ height: '100%', width: '100%' }}>
+      <MapContainer 
+        center={PARIS_CENTER} 
+        zoom={DEFAULT_ZOOM} 
+        preferCanvas 
+        style={{ height: '100%', width: '100%' }}
+        ref={mapRef}
+      >
         <TileLayer
           attribution="&copy; OpenStreetMap contributors"
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
         />
         {trees.map((tree) => {
-          const sponsorshipStatus = tree.ownerId ? 'sponsored' : 'normal';
+          let markerStyle: keyof typeof TREE_MARKER_COLORS = 'normal';
+          if (selectedTree && tree.id === selectedTree.id) {
+            markerStyle = 'selected';
+          } else if (tree.sponsorship.status === 'sponsored') {
+            markerStyle = 'sponsored';
+          } else if (tree.remarkable) {
+            markerStyle = 'remarkable';
+          }
+
           return (
             <CircleMarker
               key={tree.id}
-              center={[tree.location.coordinates[1], tree.location.coordinates[0]]} // GeoJSON is [lng, lat]
+              center={[tree.lat, tree.lon]}
               radius={5}
               pathOptions={{
-                color: TREE_MARKER_COLORS[sponsorshipStatus],
-                fillColor: TREE_MARKER_COLORS[sponsorshipStatus],
+                color: TREE_MARKER_COLORS[markerStyle],
+                fillColor: TREE_MARKER_COLORS[markerStyle],
                 fillOpacity: 0.85,
                 weight: 1,
               }}
@@ -67,6 +93,28 @@ export const TreeWarMap: React.FC = () => {
           );
         })}
       </MapContainer>
+
+      <Box sx={{ position: 'absolute', top: 16, left: 64, zIndex: 1000, width: 300 }}>
+        <Autocomplete
+          options={trees}
+          getOptionLabel={(option) => option.name || 'Arbre inconnu'}
+          onChange={(_, newValue) => {
+            if (newValue) {
+              setSelectedTree(newValue);
+              mapRef.current?.flyTo([newValue.lat, newValue.lon], 18);
+            }
+          }}
+          renderInput={(params) => (
+            <TextField 
+              {...params} 
+              label="Rechercher un arbre par nom" 
+              variant="outlined" 
+              size="small"
+              sx={{ bgcolor: 'background.paper', borderRadius: 1 }}
+            />
+          )}
+        />
+      </Box>
 
       <MapLegend />
 
@@ -90,7 +138,7 @@ export const TreeWarMap: React.FC = () => {
       >
         <CircularProgress color="inherit" />
         <Typography sx={{ color: 'white' }}>
-          Chargement des arbres du serveur...
+          {progressMsg}
         </Typography>
       </Backdrop>
     </div>

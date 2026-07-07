@@ -5,7 +5,7 @@ import ParkIcon from '@mui/icons-material/Park';
 import { Card } from '../../atoms/Card/Card';
 import { Typography } from '../../atoms/Typography/Typography';
 import { TreeStatusBadge } from '../../atoms/TreeStatusBadge/TreeStatusBadge';
-import type { BackendTree as Tree } from '../../../api/tree.api';
+import type { ParisTree as Tree } from '../../../types/tree';
 import { axiosClient } from '../../../api/axiosClient';
 import { treeApi } from '../../../api/tree.api';
 import { useAuth } from '../../../context/AuthContext';
@@ -22,32 +22,30 @@ export const TreeWarInfoPanel: React.FC<TreeWarInfoPanelProps> = ({ tree, onClos
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const isOwner = user && tree.ownerId === user.id;
+  const isOwner = user && tree.sponsorship.ownerId === user.id;
+  const currentPrice = tree.sponsorship.currentPrice || 100;
 
   const handleBuy = async () => {
     try {
       setLoading(true);
       setError(null);
-      // Let's increment the price by a random amount or a fixed step like +100
-      const newAmount = tree.price + 100; 
+      const newAmount = currentPrice + 100; 
       await axiosClient.request({
         ...treeApi.buy(),
         data: {
-          treeId: tree.id,
+          treeId: tree.sponsorship.dbTreeId,
           amount: newAmount,
-          lat: tree.location.coordinates[1],
-          lng: tree.location.coordinates[0]
+          lat: tree.lat,
+          lng: tree.lon
         }
       });
       onBuySuccess();
     } catch (err: any) {
-      setError(err.response?.data?.message || 'Erreur lors de l\'achat.');
+      setError(err.response?.data?.message || 'Erreur lors du parrainage.');
     } finally {
       setLoading(false);
     }
   };
-
-  const sponsorship = tree.ownerId ? { status: 'sponsored' as const, sponsorName: tree.owner?.username } : { status: 'available' as const };
 
   return (
     <Card
@@ -72,11 +70,11 @@ export const TreeWarInfoPanel: React.FC<TreeWarInfoPanelProps> = ({ tree, onClos
       </Stack>
 
       <Box sx={{ mt: 1, mb: 1.5 }}>
-        <TreeStatusBadge sponsorship={sponsorship} />
+        <TreeStatusBadge sponsorship={tree.sponsorship} />
       </Box>
 
       <Stack spacing={0.5} sx={{ mb: 2 }}>
-        <Typography variant="body2">Prix actuel : {formatCredits(tree.price)}</Typography>
+        <Typography variant="body2">Prix actuel : {formatCredits(currentPrice)}</Typography>
         {isOwner && (
           <Typography variant="body2" color="success.main" sx={{ fontWeight: 'bold' }}>
             Vous possédez cet arbre !
@@ -98,13 +96,13 @@ export const TreeWarInfoPanel: React.FC<TreeWarInfoPanelProps> = ({ tree, onClos
           onClick={handleBuy}
           startIcon={loading ? <CircularProgress size={20} /> : undefined}
         >
-          {loading ? 'Achat en cours...' : `Acheter pour ${formatCredits(tree.price + 100)}`}
+          {loading ? 'Parrainage en cours...' : `Parrainer pour ${formatCredits(currentPrice + 100)}`}
         </Button>
       )}
       
       {!user && (
         <Typography variant="body2" color="text.secondary" sx={{ fontStyle: 'italic' }}>
-          Connectez-vous pour acheter.
+          Connectez-vous pour parrainer.
         </Typography>
       )}
     </Card>

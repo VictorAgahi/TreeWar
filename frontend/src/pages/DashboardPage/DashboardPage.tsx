@@ -75,7 +75,7 @@ export const DashboardPage: React.FC = () => {
     };
 
     fetchData();
-  }, []);
+  }, [user?.id]);
 
   if (loading || !user) {
     return (

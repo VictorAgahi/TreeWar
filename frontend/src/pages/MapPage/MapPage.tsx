@@ -1,8 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import { Container, Stack } from '@mui/material';
-import EmojiEventsIcon from '@mui/icons-material/EmojiEvents';
+import { Container } from '@mui/material';
 import { Card } from '../../components/atoms/Card/Card';
-import { Typography } from '../../components/atoms/Typography/Typography';
 import { TreeWarMap } from '../../components/organisms/TreeWarMap/TreeWarMap';
 import { axiosClient } from '../../api/axiosClient';
 import { leaderboardApi } from '../../api/leaderboard.api';
@@ -31,43 +29,9 @@ export const MapPage: React.FC = () => {
   }, []);
 
   return (
-    <Container maxWidth="lg" sx={{ py: 4, flex: 1, display: 'flex', flexDirection: 'column', gap: 3 }}>
-      <Stack spacing={1}>
-        <Typography variant="h4" sx={{ fontWeight: 700 }}>
-          Carte des arbres de Paris
-        </Typography>
-        <Typography variant="body1" color="text.secondary">
-          Enchérissez sur les arbres de la ville et faites grimper votre entreprise au sommet du classement.
-        </Typography>
-      </Stack>
-
-      <Card noPadding sx={{ flex: 1, minHeight: 420, display: 'flex' }}>
+    <Container maxWidth="xl" sx={{ py: 2, flex: 1, display: 'flex', flexDirection: 'column', height: '100vh' }}>
+      <Card noPadding sx={{ flex: 1, display: 'flex', width: '100%', height: '100%' }}>
         <TreeWarMap />
-      </Card>
-
-      <Card>
-        <Stack direction="row" spacing={1} sx={{ alignItems: 'center', mb: 2 }}>
-          <EmojiEventsIcon color="primary" />
-          <Typography variant="h6">Top du classement</Typography>
-        </Stack>
-        {leaderboard.length === 0 ? (
-          <Typography variant="body2" color="text.secondary">
-            Aucune entreprise n'a encore parrainé d'arbre. Soyez la première !
-          </Typography>
-        ) : (
-          <Stack spacing={1.5}>
-            {leaderboard.map((entry, index) => (
-              <Stack key={entry.id} direction="row" sx={{ justifyContent: 'space-between', alignItems: 'center' }}>
-                <Typography variant="body2" sx={{ fontWeight: 600 }}>
-                  #{index + 1} {entry.username}
-                </Typography>
-                <Typography variant="body2" color="text.secondary">
-                  {entry.totalValue} crédits
-                </Typography>
-              </Stack>
-            ))}
-          </Stack>
-        )}
       </Card>
     </Container>
   );
