@@ -43,33 +43,15 @@ export class TreeService {
     treeId: string,
     userId: string,
     amount: number,
+    lat: number,
+    lng: number,
     newName?: string,
   ) {
-    // Utilisation d'une transaction pour garantir l'intégrité (déduction des crédits + changement de proprio)
     const queryRunner = this.dataSource.createQueryRunner();
     await queryRunner.connect();
     await queryRunner.startTransaction();
 
     try {
-      const tree = await queryRunner.manager.findOne(Tree, {
-        where: { id: treeId },
-        lock: { mode: 'pessimistic_write' },
-      });
-
-      if (!tree) {
-        throw new NotFoundException('Arbre non trouvé.');
-      }
-
-      if (amount <= tree.price) {
-        throw new BadRequestException(
-          'Le montant doit être strictement supérieur au prix actuel.',
-        );
-      }
-
-      if (tree.ownerId === userId) {
-        throw new BadRequestException('Vous possédez déjà cet arbre.');
-      }
-
       const user = await queryRunner.manager.findOne(User, {
         where: { id: userId },
       });
@@ -82,14 +64,41 @@ export class TreeService {
         throw new BadRequestException('Fonds insuffisants.');
       }
 
-      user.credits -= amount;
+      let tree = await queryRunner.manager.findOne(Tree, {
+        where: { id: treeId },
+        lock: { mode: 'pessimistic_write' },
+      });
 
-      tree.ownerId = user.id;
-      tree.price = amount;
+      if (tree) {
+        if (amount <= tree.price) {
+          throw new BadRequestException(
+            'Le montant doit être strictement supérieur au prix actuel.',
+          );
+        }
 
-      if (newName) {
-        tree.name = newName;
+        if (tree.ownerId === userId) {
+          throw new BadRequestException('Vous possédez déjà cet arbre.');
+        }
+
+        tree.ownerId = user.id;
+        tree.price = amount;
+        if (newName) {
+          tree.name = newName;
+        }
+      } else {
+        tree = queryRunner.manager.create(Tree, {
+          id: treeId,
+          name: newName || 'Nouvel Arbre',
+          location: {
+            type: 'Point',
+            coordinates: [lng, lat],
+          },
+          price: amount,
+          ownerId: user.id,
+        });
       }
+
+      user.credits -= amount;
 
       await queryRunner.manager.save(user);
       const updatedTree = await queryRunner.manager.save(tree);

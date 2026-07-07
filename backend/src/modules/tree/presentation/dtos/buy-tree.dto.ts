@@ -1,6 +1,7 @@
 import {
   IsNumber,
   Min,
+  Max,
   IsString,
   IsOptional,
   MaxLength,
@@ -15,4 +16,14 @@ export class BuyTreeDto {
   @IsOptional()
   @MaxLength(50)
   newName?: string;
+
+  @IsNumber()
+  @Min(-90)
+  @Max(90)
+  lat!: number;
+
+  @IsNumber()
+  @Min(-180)
+  @Max(180)
+  lng!: number;
 }

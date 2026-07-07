@@ -26,4 +26,49 @@ export class UserRepository {
     const newUser = this.repository.create(user);
     return this.repository.save(newUser);
   }
+
+  async getTopUsersByTreeCount(limit: number) {
+    return this.repository
+      .createQueryBuilder('user')
+      .leftJoin('user.trees', 'tree')
+      .select([
+        'user.id AS id',
+        'user.username AS username',
+        'COUNT(tree.id)::int AS "treeCount"',
+      ])
+      .groupBy('user.id')
+      .orderBy('"treeCount"', 'DESC')
+      .limit(limit)
+      .getRawMany();
+  }
+
+  async getTopUsersByTotalTreeValue(limit: number) {
+    return this.repository
+      .createQueryBuilder('user')
+      .leftJoin('user.trees', 'tree')
+      .select([
+        'user.id AS id',
+        'user.username AS username',
+        'COALESCE(SUM(tree.price), 0)::int AS "totalValue"',
+      ])
+      .groupBy('user.id')
+      .orderBy('"totalValue"', 'DESC')
+      .limit(limit)
+      .getRawMany();
+  }
+
+  async getTopUsersByMostExpensiveTree(limit: number) {
+    return this.repository
+      .createQueryBuilder('user')
+      .leftJoin('user.trees', 'tree')
+      .select([
+        'user.id AS id',
+        'user.username AS username',
+        'COALESCE(MAX(tree.price), 0)::int AS "maxTreePrice"',
+      ])
+      .groupBy('user.id')
+      .orderBy('"maxTreePrice"', 'DESC')
+      .limit(limit)
+      .getRawMany();
+  }
 }

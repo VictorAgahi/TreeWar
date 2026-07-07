@@ -1,5 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { INestApplication, ValidationPipe } from '@nestjs/common';
+import { DataSource } from 'typeorm';
 const request = require('supertest');
 import { App } from 'supertest/types';
 import { AppModule } from './../src/app.module';
@@ -17,6 +18,11 @@ describe('Tree Module (e2e)', () => {
     app = moduleFixture.createNestApplication();
     app.useGlobalPipes(new ValidationPipe());
     await app.init();
+
+    // Clear DB
+    const dataSource = app.get(DataSource);
+    await dataSource.query('DELETE FROM "trees"');
+    await dataSource.query('DELETE FROM "users"');
 
     // Create a user and login to get token
     const userEmail = `tree-test-${Date.now()}@example.com`;
@@ -59,31 +65,31 @@ describe('Tree Module (e2e)', () => {
     });
   });
 
-  describe('/tree/:id/buy (POST) - Buy', () => {
+  describe('/tree/:id/buy (PUT) - Buy', () => {
     it('should fail to buy tree if not authenticated', async () => {
       const response = await request(app.getHttpServer())
-        .post(`/tree/${treeId}/buy`)
-        .send({ amount: 300 });
+        .put(`/tree/${treeId}/buy`)
+        .send({ amount: 300, lat: 48.8566, lng: 2.3522 });
 
       expect(response.status).toBe(401);
     });
 
     it('should fail to buy tree if amount is too low', async () => {
       const response = await request(app.getHttpServer())
-        .post(`/tree/${treeId}/buy`)
+        .put(`/tree/${treeId}/buy`)
         .set('Authorization', `Bearer ${accessToken}`)
-        .send({ amount: 150 }); // Tree price is 200
+        .send({ amount: 150, lat: 48.8566, lng: 2.3522 }); // Tree price is 200
 
       expect(response.status).toBe(400);
     });
 
     it('should successfully buy tree, deduct credits, and rename it', async () => {
       const response = await request(app.getHttpServer())
-        .post(`/tree/${treeId}/buy`)
+        .put(`/tree/${treeId}/buy`)
         .set('Authorization', `Bearer ${accessToken}`)
-        .send({ amount: 300, newName: 'Mon Super Arbre' });
+        .send({ amount: 300, lat: 48.8566, lng: 2.3522, newName: 'Mon Super Arbre' });
 
-      expect(response.status).toBe(201); // Created (NestJS POST default)
+      expect(response.status).toBe(200); // OK (NestJS PUT default)
       expect(response.body).toHaveProperty('price', 300);
       expect(response.body).toHaveProperty('ownerId');
       expect(response.body).toHaveProperty('name', 'Mon Super Arbre');

@@ -85,4 +85,16 @@ export class UserService {
     const { passwordHash, ...result } = user;
     return result;
   }
+
+  async getTopUsersByTreeCount(limit: number = 10) {
+    return this.userRepository.getTopUsersByTreeCount(limit);
+  }
+
+  async getTopUsersByTotalTreeValue(limit: number = 10) {
+    return this.userRepository.getTopUsersByTotalTreeValue(limit);
+  }
+
+  async getTopUsersByMostExpensiveTree(limit: number = 10) {
+    return this.userRepository.getTopUsersByMostExpensiveTree(limit);
+  }
 }

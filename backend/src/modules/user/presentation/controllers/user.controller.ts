@@ -53,4 +53,19 @@ export class UserController {
   ) {
     return this.userService.updateUsername(user.sub, updateDto.username);
   }
+
+  @Get('leaderboard/most-trees')
+  async getTopByTrees() {
+    return this.userService.getTopUsersByTreeCount(10);
+  }
+
+  @Get('leaderboard/total-value')
+  async getTopByTotalValue() {
+    return this.userService.getTopUsersByTotalTreeValue(10);
+  }
+
+  @Get('leaderboard/most-expensive-tree')
+  async getTopByExpensiveTree() {
+    return this.userService.getTopUsersByMostExpensiveTree(10);
+  }
 }
