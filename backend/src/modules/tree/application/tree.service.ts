@@ -5,9 +5,10 @@ import {
 } from '@nestjs/common';
 import { DataSource } from 'typeorm';
 import { TreeRepository } from '../infrastructure/repositories/tree.repository';
-import { CreateTreeDto } from '../presentation/dtos/create-tree.dto';
+
 import { User } from '../../user/domain/entities/user.entity';
 import { Tree } from '../domain/entities/tree.entity';
+import { randomUUID } from 'crypto';
 
 @Injectable()
 export class TreeService {
@@ -28,25 +29,19 @@ export class TreeService {
     return tree;
   }
 
-  async createTree(dto: CreateTreeDto) {
-    return this.treeRepository.save({
-      name: dto.name,
-      location: {
-        type: 'Point',
-        coordinates: [dto.lng, dto.lat],
-      },
-      price: dto.price ?? 100,
-    });
+  async getTreesByOwner(userId: string) {
+    return this.treeRepository.findByOwnerId(userId);
   }
 
   async buyTree(
-    treeId: string,
     userId: string,
     amount: number,
     lat: number,
     lng: number,
     newName?: string,
+    treeId?: string,
   ) {
+    const idToUse = treeId;
     const queryRunner = this.dataSource.createQueryRunner();
     await queryRunner.connect();
     await queryRunner.startTransaction();
@@ -65,7 +60,7 @@ export class TreeService {
       }
 
       let tree = await queryRunner.manager.findOne(Tree, {
-        where: { id: treeId },
+        where: { id: idToUse },
         lock: { mode: 'pessimistic_write' },
       });
 
@@ -87,7 +82,7 @@ export class TreeService {
         }
       } else {
         tree = queryRunner.manager.create(Tree, {
-          id: treeId,
+          id: randomUUID(),
           name: newName || 'Nouvel Arbre',
           location: {
             type: 'Point',

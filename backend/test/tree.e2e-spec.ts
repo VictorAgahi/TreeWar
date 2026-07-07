@@ -8,7 +8,7 @@ import { AppModule } from './../src/app.module';
 describe('Tree Module (e2e)', () => {
   let app: INestApplication<App>;
   let accessToken: string;
-  let treeId: string;
+  let treeId: string = '00000000-0000-0000-0000-000000000001';
 
   beforeAll(async () => {
     const moduleFixture: TestingModule = await Test.createTestingModule({
@@ -44,50 +44,43 @@ describe('Tree Module (e2e)', () => {
     await app.close();
   });
 
-  describe('/tree (POST) - Create', () => {
-    it('should create a new tree', async () => {
-      const createPayload = {
-        name: 'Chêne centenaire',
-        lat: 48.8566,
-        lng: 2.3522,
-        price: 200,
-      };
 
-      const response = await request(app.getHttpServer())
-        .post('/tree')
-        .send(createPayload);
 
-      expect(response.status).toBe(201);
-      expect(response.body).toHaveProperty('id');
-      expect(response.body).toHaveProperty('name', 'Chêne centenaire');
-      expect(response.body).toHaveProperty('price', 200);
-      treeId = response.body.id;
-    });
-  });
-
-  describe('/tree/:id/buy (PUT) - Buy', () => {
+  describe('/tree/buy (PUT) - Buy', () => {
     it('should fail to buy tree if not authenticated', async () => {
       const response = await request(app.getHttpServer())
-        .put(`/tree/${treeId}/buy`)
-        .send({ amount: 300, lat: 48.8566, lng: 2.3522 });
+        .put(`/tree/buy`)
+        .send({ treeId, amount: 300, lat: 48.8566, lng: 2.3522 });
 
       expect(response.status).toBe(401);
     });
 
     it('should fail to buy tree if amount is too low', async () => {
-      const response = await request(app.getHttpServer())
-        .put(`/tree/${treeId}/buy`)
+      const uniqueTreeId = '00000000-0000-0000-0000-000000000002';
+      await request(app.getHttpServer())
+        .put(`/tree/buy`)
         .set('Authorization', `Bearer ${accessToken}`)
-        .send({ amount: 150, lat: 48.8566, lng: 2.3522 }); // Tree price is 200
+        .send({ treeId: uniqueTreeId, amount: 200, lat: 48.8566, lng: 2.3522 });
+        
+      const email = `test2-${Date.now()}@example.com`;
+      await request(app.getHttpServer()).post('/user/register').send({ email, password: 'password123' });
+      const login = await request(app.getHttpServer()).post('/user/login').send({ email, password: 'password123' });
+      const token2 = login.body.accessToken;
+
+      const response = await request(app.getHttpServer())
+        .put(`/tree/buy`)
+        .set('Authorization', `Bearer ${token2}`)
+        .send({ treeId: uniqueTreeId, amount: 150, lat: 48.8566, lng: 2.3522 }); // Tree price is 200
 
       expect(response.status).toBe(400);
     });
 
     it('should successfully buy tree, deduct credits, and rename it', async () => {
+      const uniqueTreeId3 = '00000000-0000-0000-0000-000000000003';
       const response = await request(app.getHttpServer())
-        .put(`/tree/${treeId}/buy`)
+        .put(`/tree/buy`)
         .set('Authorization', `Bearer ${accessToken}`)
-        .send({ amount: 300, lat: 48.8566, lng: 2.3522, newName: 'Mon Super Arbre' });
+        .send({ treeId: uniqueTreeId3, amount: 300, lat: 48.8566, lng: 2.3522, newName: 'Mon Super Arbre' });
 
       expect(response.status).toBe(200); // OK (NestJS PUT default)
       expect(response.body).toHaveProperty('price', 300);
@@ -100,8 +93,28 @@ describe('Tree Module (e2e)', () => {
         .set('Authorization', `Bearer ${accessToken}`);
       
       expect(meRes.status).toBe(200);
-      // user starts with 3000 credits, deducted 300 -> 2700
-      expect(meRes.body.credits).toBe(2700);
+      // user starts with 3000 credits, deducted 200 (previous test) then 300 (this test) -> 2500
+      expect(meRes.body.credits).toBe(2500);
+    });
+  });
+
+  describe('/tree/me (GET) - Get My Trees', () => {
+    it('should return the trees owned by the user', async () => {
+      const response = await request(app.getHttpServer())
+        .get('/tree/me')
+        .set('Authorization', `Bearer ${accessToken}`);
+
+      expect(response.status).toBe(200);
+      expect(Array.isArray(response.body)).toBeTruthy();
+      expect(response.body.length).toBe(2); // ID 2 (200 credits) + ID 3 (300 credits)
+      // Check that the renamed one is there
+      const renamedTree = response.body.find((t: any) => t.id === '00000000-0000-0000-0000-000000000003');
+      expect(renamedTree).toHaveProperty('name', 'Mon Super Arbre');
+    });
+
+    it('should fail if not authenticated', async () => {
+      const response = await request(app.getHttpServer()).get('/tree/me');
+      expect(response.status).toBe(401);
     });
   });
 });

@@ -25,4 +25,11 @@ export class TreeRepository {
     const newTree = this.repository.create(tree);
     return this.repository.save(newTree);
   }
+
+  async findByOwnerId(ownerId: string): Promise<Tree[]> {
+    return this.repository.find({
+      where: { ownerId },
+      relations: { owner: true },
+    });
+  }
 }

@@ -1,14 +1,6 @@
-import {
-  Controller,
-  Get,
-  Post,
-  Put,
-  Body,
-  Param,
-  UseGuards,
-} from '@nestjs/common';
+import { Controller, Get, Put, Body, Param, UseGuards } from '@nestjs/common';
 import { TreeService } from '../../application/tree.service';
-import { CreateTreeDto } from '../dtos/create-tree.dto';
+
 import { BuyTreeDto } from '../dtos/buy-tree.dto';
 import { JwtAuthGuard } from '../../../../common/guards/jwt-auth.guard';
 import { CurrentUser } from '../../../../common/decorators/current-user.decorator';
@@ -23,30 +15,27 @@ export class TreeController {
     return this.treeService.findAll();
   }
 
+  @UseGuards(JwtAuthGuard)
+  @Get('me')
+  async getMyTrees(@CurrentUser() user: JwtPayload) {
+    return this.treeService.getTreesByOwner(user.sub);
+  }
+
   @Get(':id')
   async getTree(@Param('id') id: string) {
     return this.treeService.getTreeById(id);
   }
 
-  @Post()
-  async createTree(@Body() dto: CreateTreeDto) {
-    return this.treeService.createTree(dto);
-  }
-
   @UseGuards(JwtAuthGuard)
-  @Put(':id/buy')
-  async buyTree(
-    @Param('id') id: string,
-    @CurrentUser() user: JwtPayload,
-    @Body() dto: BuyTreeDto,
-  ) {
+  @Put('buy')
+  async buyTree(@CurrentUser() user: JwtPayload, @Body() dto: BuyTreeDto) {
     return this.treeService.buyTree(
-      id,
       user.sub,
       dto.amount,
       dto.lat,
       dto.lng,
       dto.newName,
+      dto.treeId,
     );
   }
 }

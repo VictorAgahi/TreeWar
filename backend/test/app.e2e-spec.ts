@@ -193,24 +193,22 @@ describe('User Module (e2e)', () => {
       const user2Token = users[1].token; user2Name = users[1].username;
       const user3Token = users[2].token; user3Name = users[2].username;
 
-      // Create 4 trees
-      const trees = [];
-      for (let i = 1; i <= 4; i++) {
-        const res = await request(app.getHttpServer()).post('/tree').send({
-          name: `Tree ${i}`, lat: 0, lng: 0, price: i * 100 // 100, 200, 300, 400
-        });
-        trees.push(res.body.id);
-      }
+      const treeIds = [
+        '10000000-0000-0000-0000-000000000001',
+        '10000000-0000-0000-0000-000000000002',
+        '10000000-0000-0000-0000-000000000003',
+        '10000000-0000-0000-0000-000000000004'
+      ];
 
       // User 1 buys Tree 1 (150) and Tree 2 (250) -> count: 2, total: 400, max: 250
-      await request(app.getHttpServer()).put(`/tree/${trees[0]}/buy`).set('Authorization', `Bearer ${user1Token}`).send({ amount: 150, lat: 0, lng: 0 });
-      await request(app.getHttpServer()).put(`/tree/${trees[1]}/buy`).set('Authorization', `Bearer ${user1Token}`).send({ amount: 250, lat: 0, lng: 0 });
+      await request(app.getHttpServer()).put(`/tree/buy`).set('Authorization', `Bearer ${user1Token}`).send({ treeId: treeIds[0], amount: 150, lat: 0, lng: 0 });
+      await request(app.getHttpServer()).put(`/tree/buy`).set('Authorization', `Bearer ${user1Token}`).send({ treeId: treeIds[1], amount: 250, lat: 0, lng: 0 });
 
       // User 2 buys Tree 3 (350) -> count: 1, total: 350, max: 350
-      await request(app.getHttpServer()).put(`/tree/${trees[2]}/buy`).set('Authorization', `Bearer ${user2Token}`).send({ amount: 350, lat: 0, lng: 0 });
+      await request(app.getHttpServer()).put(`/tree/buy`).set('Authorization', `Bearer ${user2Token}`).send({ treeId: treeIds[2], amount: 350, lat: 0, lng: 0 });
 
       // User 3 buys Tree 4 (450) -> count: 1, total: 450, max: 450
-      await request(app.getHttpServer()).put(`/tree/${trees[3]}/buy`).set('Authorization', `Bearer ${user3Token}`).send({ amount: 450, lat: 0, lng: 0 });
+      await request(app.getHttpServer()).put(`/tree/buy`).set('Authorization', `Bearer ${user3Token}`).send({ treeId: treeIds[3], amount: 450, lat: 0, lng: 0 });
     });
 
     it('should get top users by trees count', async () => {
@@ -270,6 +268,11 @@ describe('User Module (e2e)', () => {
     const users: { token: string; username: string }[] = [];
     
     beforeAll(async () => {
+      // Clear DB to isolate this scenario
+      const dataSource = app.get(DataSource);
+      await dataSource.query('DELETE FROM "trees"');
+      await dataSource.query('DELETE FROM "users"');
+
       // Create 10 users
       for (let i = 0; i < 10; i++) {
         const email = `mass-test-${i}-${Date.now()}@example.com`;
@@ -283,9 +286,9 @@ describe('User Module (e2e)', () => {
         // use upsert directly with uuid
         const treeUuid = `00000000-0000-0000-0000-${treeIndex.toString().padStart(12, '0')}`;
         await request(app.getHttpServer())
-          .put(`/tree/${treeUuid}/buy`)
+          .put(`/tree/buy`)
           .set('Authorization', `Bearer ${users[userIndex].token}`)
-          .send({ amount, lat: 10, lng: 20 });
+          .send({ treeId: treeUuid, amount, lat: 10, lng: 20 });
       };
 
       // u0 buys 26 trees at 100
@@ -322,6 +325,7 @@ describe('User Module (e2e)', () => {
       expect(response.status).toBe(200);
       
       const ranks = response.body.map((u: LeaderboardUser) => u.username);
+      console.log('TOTAL VALUE:', response.body);
       // Order should be u0 (2600) > u2 (2500) > u3 (2000) > u1 (1500)
       expect(ranks.indexOf(users[0].username)).toBeLessThan(ranks.indexOf(users[2].username));
       expect(ranks.indexOf(users[2].username)).toBeLessThan(ranks.indexOf(users[3].username));

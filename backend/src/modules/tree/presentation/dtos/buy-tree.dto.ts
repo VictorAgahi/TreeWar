@@ -8,6 +8,10 @@ import {
 } from 'class-validator';
 
 export class BuyTreeDto {
+  @IsString()
+  @IsOptional()
+  treeId?: string;
+
   @IsNumber()
   @Min(1)
   amount!: number;
