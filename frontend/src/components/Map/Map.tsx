@@ -70,7 +70,13 @@ const LocationMarker = ({ room }: { room: string }) => {
   );
 };
 
-export const MapComponent: React.FC = () => {
+export interface MapComponentProps {
+  room: string;
+  nickname: string;
+}
+
+export const MapComponent: React.FC<MapComponentProps> = ({ room, nickname }) => {
+  console.log(`Rendering map for ${nickname} in room ${room}`); // temp usage to avoid unused var warning
   return (
     <div style={{ height: '100vh', width: '100%' }}>
       <MapContainer center={[48.8566, 2.3522]} zoom={13} style={{ height: '100%', width: '100%' }}>
@@ -78,7 +84,7 @@ export const MapComponent: React.FC = () => {
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
         />
-        <LocationMarker room="global" />
+        <LocationMarker room={room || 'global'} />
       </MapContainer>
     </div>
   );
