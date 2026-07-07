@@ -1,9 +1,9 @@
 import React from 'react';
-import { Box, Container, Stack } from '@mui/material';
-import ParkIcon from '@mui/icons-material/Park';
+import { Container, Stack } from '@mui/material';
 import EmojiEventsIcon from '@mui/icons-material/EmojiEvents';
 import { Card } from '../../components/atoms/Card/Card';
 import { Typography } from '../../components/atoms/Typography/Typography';
+import { ParisTreeMap } from '../../components/organisms/ParisTreeMap/ParisTreeMap';
 
 const LEADERBOARD_PREVIEW = [
   { rank: 1, company: 'EcoBank', trees: 42 },
@@ -24,28 +24,7 @@ export const HomePage: React.FC = () => {
       </Stack>
 
       <Card noPadding sx={{ flex: 1, minHeight: 420, display: 'flex' }}>
-        <Box
-          sx={{
-            flex: 1,
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-            justifyContent: 'center',
-            gap: 1.5,
-            bgcolor: 'action.hover',
-            borderRadius: 4,
-            m: 2,
-            p: 4,
-          }}
-        >
-          <ParkIcon color="primary" sx={{ fontSize: 56 }} />
-          <Typography variant="h6" color="text.secondary">
-            La carte interactive Leaflet s'affichera ici
-          </Typography>
-          <Typography variant="body2" color="text.disabled">
-            ~200 000 arbres, filtrables par arrondissement et espèce
-          </Typography>
-        </Box>
+        <ParisTreeMap />
       </Card>
 
       <Card>
