@@ -81,7 +81,7 @@ export const BankPage: React.FC = () => {
       <Box sx={{ textAlign: 'center', mb: 4 }}>
         <AccountBalanceWalletIcon sx={{ fontSize: 48, color: 'primary.main', mb: 2 }} />
         <Typography variant="h4" sx={{ fontWeight: 800, mb: 1 }}>
-          Banque TreeWar
+          Banque InvesTree
         </Typography>
         <Typography variant="body1" color="text.secondary" sx={{ maxWidth: 'sm', mx: 'auto', mb: 1 }}>
           Rechargez votre compte pour investir dans plus d'arbres et dominer le marché.

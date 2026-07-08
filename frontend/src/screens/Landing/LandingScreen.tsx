@@ -148,7 +148,7 @@ export const LandingScreen: React.FC = () => {
             <Stack direction="row" spacing={1} sx={{ alignItems: 'center' }}>
               <ForestIcon color="primary" fontSize="large" />
               <Typography variant="h6" sx={{ fontWeight: 700 }}>
-                TreeWar
+                InvesTree
               </Typography>
             </Stack>
             <Stack direction="row" spacing={1.5}>
@@ -201,7 +201,7 @@ export const LandingScreen: React.FC = () => {
               </Typography>
               <Typography variant="h6" color="text.secondary" sx={{ fontWeight: 400 }}>
                 Parainez des arbres réels, faites grandir votre empreinte verte et propulsez votre
-                entreprise en tête du classement TreeWar.
+                entreprise en tête du classement InvesTree.
               </Typography>
               <Stack
                 direction={{ xs: 'column', sm: 'row' }}
@@ -277,7 +277,7 @@ export const LandingScreen: React.FC = () => {
         <Container maxWidth="lg">
           <Stack spacing={1} sx={{ textAlign: 'center', mb: 6 }}>
             <Typography variant="h3" sx={{ fontWeight: 700, fontSize: { xs: '2rem', md: '2.5rem' } }}>
-              Pourquoi jouer à TreeWar ?
+              Pourquoi jouer à InvesTree ?
             </Typography>
             <Typography variant="body1" color="text.secondary">
               Un impact réel, une compétition stratégique, une carte vivante.
@@ -329,7 +329,7 @@ export const LandingScreen: React.FC = () => {
               Prêt à planter votre empreinte ?
             </Typography>
             <Typography variant="body1" sx={{ opacity: 0.9, maxWidth: 480 }}>
-              Rejoignez TreeWar en quelques secondes et commencez à sponsoriser vos premiers arbres dès aujourd'hui.
+              Rejoignez InvesTree en quelques secondes et commencez à sponsoriser vos premiers arbres dès aujourd'hui.
             </Typography>
             <Button
               component={RouterLink}
@@ -358,11 +358,11 @@ export const LandingScreen: React.FC = () => {
             <Stack direction="row" spacing={1} sx={{ alignItems: 'center' }}>
               <ForestIcon color="primary" fontSize="small" />
               <Typography variant="body2" sx={{ fontWeight: 600 }}>
-                TreeWar
+                InvesTree
               </Typography>
             </Stack>
             <Typography variant="caption" color="text.secondary">
-              © 2026 TreeWar. Fait avec 🌳 à Paris.
+              © 2026 InvesTree. Fait avec 🌳 à Paris.
             </Typography>
           </Stack>
         </Container>

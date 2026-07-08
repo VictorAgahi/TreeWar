@@ -48,7 +48,7 @@ export const Navbar: React.FC = () => {
           >
             <ForestIcon color="primary" fontSize="large" />
             <Typography variant="h6" component="span" color="text.primary" sx={{ fontWeight: 700 }}>
-              TreeWar
+              InvesTree
             </Typography>
           </Box>
 

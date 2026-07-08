@@ -1,6 +1,6 @@
 #!/bin/bash
 
-echo "🌳 Lancement de TreeWar..."
+echo "🌳 Lancement de InvesTree..."
 
 # Lancement du backend en arrière-plan
 echo "🚀 Démarrage du backend NestJS..."

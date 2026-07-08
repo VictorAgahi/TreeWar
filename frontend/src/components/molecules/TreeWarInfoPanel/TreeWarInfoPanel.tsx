@@ -15,13 +15,13 @@ import { treeApi } from '../../../api/tree.api';
 import { useAuth } from '../../../context/AuthContext';
 import { formatCredits } from '../../../utils/format';
 
-export interface TreeWarInfoPanelProps {
+export interface InvesTreeInfoPanelProps {
   tree: Tree;
   onClose: () => void;
   onBuySuccess: () => void;
 }
 
-export const TreeWarInfoPanel: React.FC<TreeWarInfoPanelProps> = ({ tree, onClose, onBuySuccess }) => {
+export const InvesTreeInfoPanel: React.FC<InvesTreeInfoPanelProps> = ({ tree, onClose, onBuySuccess }) => {
   const { user, refreshUser } = useAuth();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -75,23 +75,20 @@ export const TreeWarInfoPanel: React.FC<TreeWarInfoPanelProps> = ({ tree, onClos
         top: 16,
         right: 16,
         width: 380,
-        maxHeight: 'calc(100dvh - 32px)',
+        maxHeight: 'calc(100% - 32px)',
         display: 'flex',
         flexDirection: 'column',
         zIndex: 1000,
         boxShadow: '0 12px 40px rgba(0,0,0,0.15)',
         borderRadius: 3,
         bgcolor: 'background.paper',
+        overflowY: 'auto',
+        overflowX: 'hidden',
+        '&::-webkit-scrollbar': { width: '6px' },
+        '&::-webkit-scrollbar-thumb': { backgroundColor: 'rgba(0,0,0,0.2)', borderRadius: '3px' },
       }}
     >
-      <Box
-        sx={{
-          overflowY: 'auto',
-          flex: 1,
-          '&::-webkit-scrollbar': { width: '6px' },
-          '&::-webkit-scrollbar-thumb': { backgroundColor: 'rgba(0,0,0,0.2)', borderRadius: '3px' },
-        }}
-      >
+      <Box sx={{ flex: 1 }}>
         <Box sx={{ position: 'relative' }}>
         {hasImage && (
           <CardMedia

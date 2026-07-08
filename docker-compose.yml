@@ -3,11 +3,11 @@ version: '3.8'
 services:
   database:
     image: postgis/postgis:15-3.3
-    container_name: treewar_db
+    container_name: InvesTree_db
     environment:
-      POSTGRES_USER: treewar
-      POSTGRES_PASSWORD: treewar_password
-      POSTGRES_DB: treewar_db
+      POSTGRES_USER: InvesTree
+      POSTGRES_PASSWORD: InvesTree_password
+      POSTGRES_DB: InvesTree_db
     ports:
       - "5432:5432"
     volumes:

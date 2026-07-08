@@ -1,10 +1,10 @@
-# TreeWar - AI Agent Master Guidelines
+# InvesTree - AI Agent Master Guidelines
 
-Welcome to the **TreeWar** project. You are acting as an Elite Full-Stack AI Engineer. This document dictates how you should approach every task in this repository.
+Welcome to the **InvesTree** project. You are acting as an Elite Full-Stack AI Engineer. This document dictates how you should approach every task in this repository.
 
 ## 1. Project Specifications (The Bible)
 Before implementing any core feature or making architectural decisions, you **MUST** understand the game mechanics, the scope of the 48h MVP, and the authoritative server model.
-👉 **Always refer to:** [TreeWar_Full_Spec.md](TreeWar_Full_Spec.md)
+👉 **Always refer to:** [InvesTree_Full_Spec.md](InvesTree_Full_Spec.md)
 
 ## 2. Dynamic Skill Loading
 This project strictly enforces clean code and elite architecture through "Skills". Depending on the scope of the user's request, you **MUST** read and apply the rules from the relevant `SKILL.md` files located in the `.agents/skills` directories:
@@ -29,4 +29,4 @@ If the task involves NestJS, Socket.io, Turf.js, or authoritative game state:
 - **`backend/.agents/skills/backend-clean-code/SKILL.md`**: Strict TypeScript, absolute ban on `any`, and explicit error handling.
 
 ## 3. The Golden Rule
-If a request is ambiguous, lacks edge-case definitions, or conflicts with the `TreeWar_Full_Spec.md`, **DO NOT code blindly**. You must stop, ask the user relevant clarifying questions, and propose 2-3 logical architectural options.
+If a request is ambiguous, lacks edge-case definitions, or conflicts with the `InvesTree_Full_Spec.md`, **DO NOT code blindly**. You must stop, ask the user relevant clarifying questions, and propose 2-3 logical architectural options.

@@ -9,7 +9,7 @@ import CloseIcon from '@mui/icons-material/Close';
 import { useAuth } from '../../../context/AuthContext';
 import { useAppTheme } from '../../../context/ThemeContext';
 import { Typography } from '../../atoms/Typography/Typography';
-import { TreeWarInfoPanel } from '../../molecules/TreeWarInfoPanel/TreeWarInfoPanel';
+import { InvesTreeInfoPanel } from '../../molecules/TreeWarInfoPanel/TreeWarInfoPanel';
 import { MapLegend } from '../../molecules/MapLegend/MapLegend';
 import { axiosClient } from '../../../api/axiosClient';
 import type { ParisTree } from '../../../types/tree';
@@ -53,7 +53,7 @@ const MapFlyTo: React.FC<{ targetTree: ParisTree | null; pendingTarget: [number,
   return null;
 };
 
-export const TreeWarMap: React.FC = () => {
+export const InvesTreeMap: React.FC = () => {
   const mapRef = useRef<LeafletMap | null>(null);
   const [trees, setTrees] = useState<ParisTree[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -349,7 +349,7 @@ export const TreeWarMap: React.FC = () => {
       </Popover>
 
       {selectedTree && (
-        <TreeWarInfoPanel
+        <InvesTreeInfoPanel
           tree={selectedTree}
           onClose={() => setSelectedTree(null)}
           onBuySuccess={handleBuySuccess}

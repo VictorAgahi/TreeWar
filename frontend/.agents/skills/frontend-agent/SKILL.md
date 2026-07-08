@@ -1,8 +1,8 @@
 ---
 name: frontend-agent
-description: Comprehensive Front-End AI Agent skills for the TreeWar project, including Map UX, state sync, and robustness.
+description: Comprehensive Front-End AI Agent skills for the InvesTree project, including Map UX, state sync, and robustness.
 ---
-# Front-End AI Agent Guidelines (TreeWar)
+# Front-End AI Agent Guidelines (InvesTree)
 
 When modifying the React frontend or map components:
 

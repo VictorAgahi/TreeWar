@@ -39,7 +39,7 @@ export const AdminPage: React.FC = () => {
           Administration 🛠️
         </Typography>
         <Typography variant="body1" color="text.secondary">
-          Espace réservé à l&apos;administration du jeu TreeWar.
+          Espace réservé à l&apos;administration du jeu InvesTree.
         </Typography>
       </Box>
 

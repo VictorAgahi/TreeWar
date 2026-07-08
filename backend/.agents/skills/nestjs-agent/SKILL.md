@@ -1,10 +1,10 @@
 ---
 name: nestjs-agent
-description: Comprehensive Backend AI Agent skills for the TreeWar project, focusing on NestJS, WebSockets, and real-time state.
+description: Comprehensive Backend AI Agent skills for the InvesTree project, focusing on NestJS, WebSockets, and real-time state.
 ---
-# NestJS Backend Guidelines (TreeWar)
+# NestJS Backend Guidelines (InvesTree)
 
-When modifying the NestJS backend, services, or WebSockets gateways for the TreeWar project, adhere to these rules:
+When modifying the NestJS backend, services, or WebSockets gateways for the InvesTree project, adhere to these rules:
 
 1. **Architecture & Encapsulation:**
    - Follow NestJS module boundaries strictly. Keep features cleanly isolated (e.g., `GameModule` encapsulating `GameSessionService` and `GameGateway`).

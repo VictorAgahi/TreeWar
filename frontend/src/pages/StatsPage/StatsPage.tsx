@@ -212,7 +212,7 @@ export const StatsPage: React.FC = () => {
         <BarChartIcon sx={{ color: 'primary.main', fontSize: 38 }} />
         <Box>
           <Typography variant="h4" sx={{ fontWeight: 800, lineHeight: 1.1 }}>Statistiques</Typography>
-          <Typography variant="body2" color="text.secondary">Vue analytique complète — TreeWar</Typography>
+          <Typography variant="body2" color="text.secondary">Vue analytique complète — InvesTree</Typography>
         </Box>
       </Box>
 
@@ -240,7 +240,7 @@ export const StatsPage: React.FC = () => {
       }}>
         <Typography variant="h6" color="primary.main" sx={{ fontWeight: 700, display: 'flex', alignItems: 'center', gap: 1 }}>
           <TrendingUpIcon />
-          Marché Global TreeWar
+          Marché Global InvesTree
         </Typography>
         
         <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', md: 'repeat(3, 1fr)' }, gap: 2 }}>

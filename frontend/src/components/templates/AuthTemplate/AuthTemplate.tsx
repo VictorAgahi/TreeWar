@@ -40,7 +40,7 @@ export const AuthTemplate: React.FC<AuthTemplateProps> = ({
         >
           <ForestIcon color="primary" fontSize="large" />
           <Typography variant="h6" sx={{ fontWeight: 700 }}>
-            TreeWar
+            InvesTree
           </Typography>
         </Stack>
       </Container>

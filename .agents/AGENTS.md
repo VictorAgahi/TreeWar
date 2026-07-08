@@ -1,4 +1,4 @@
-# Règles globales du projet TreeWar
+# Règles globales du projet InvesTree
 
 ## Vérification systématique
 À la fin de chaque instruction ou série d'actions ayant modifié le code (frontend ou backend), tu **DOIS IMPÉRATIVEMENT** :

@@ -2,7 +2,7 @@
   "version": "0.2.0",
   "compounds": [
     {
-      "name": "Launch TreeWar (All)",
+      "name": "Launch InvesTree (All)",
       "configurations": ["Backend (NestJS)", "Frontend (Vite)"]
     }
   ],
