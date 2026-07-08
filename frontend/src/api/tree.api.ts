@@ -45,11 +45,15 @@ export function mergeTreeSponsorships(trees: ParisTree[], backendTrees: BackendT
     byCoord.set(coordKey(lat, lng), backendTree);
   }
 
-  return trees.map((tree) => {
-    const match = byCoord.get(coordKey(tree.lat, tree.lon));
+  const matchedKeys = new Set<string>();
+
+  const merged = trees.map((tree) => {
+    const key = coordKey(tree.lat, tree.lon);
+    const match = byCoord.get(key);
     if (!match) {
       return tree;
     }
+    matchedKeys.add(key);
     return {
       ...tree,
       name: match.name || tree.name,
@@ -61,6 +65,38 @@ export function mergeTreeSponsorships(trees: ParisTree[], backendTrees: BackendT
         currentPrice: match.price,
         ownerId: match.ownerId ?? undefined,
       },
-    };
+    } as ParisTree;
   });
+
+  // Append backend trees that didn't match any Open Data tree (e.g., from seed or coordinate drift)
+  for (const backendTree of backendTrees) {
+    const [lng, lat] = backendTree.location.coordinates;
+    const key = coordKey(lat, lng);
+    if (!matchedKeys.has(key)) {
+      merged.push({
+        id: `custom-${backendTree.id}`,
+        name: backendTree.name || 'Arbre',
+        genus: 'Inconnu',
+        species: 'Inconnu',
+        address: 'Inconnue',
+        district: "1", // Fallback
+        heightM: null,
+        circumferenceCm: null,
+        developmentStage: 'Inconnu',
+        lat,
+        lon: lng,
+        remarkable: null,
+        sponsorship: {
+          status: 'sponsored',
+          companyName: backendTree.owner?.username ?? 'Entreprise',
+          customName: backendTree.name,
+          dbTreeId: backendTree.id,
+          currentPrice: backendTree.price,
+          ownerId: backendTree.ownerId ?? undefined,
+        },
+      });
+    }
+  }
+
+  return merged;
 }

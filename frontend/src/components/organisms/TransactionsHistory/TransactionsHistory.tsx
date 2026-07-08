@@ -5,7 +5,7 @@ import { Button } from '../../atoms/Button/Button';
 import { Card } from '../../atoms/Card/Card';
 import { Typography } from '../../atoms/Typography/Typography';
 import type { SponsoredTree } from '../../../types/dashboard.types';
-import { formatCredits, formatDateFr, formatOrdinalFr } from '../../../utils/format';
+import { formatCredits, formatDateFr } from '../../../utils/format';
 
 const VISIBLE_COUNT = 5;
 
@@ -48,7 +48,7 @@ export const TransactionsHistory: React.FC<TransactionsHistoryProps> = ({ transa
                   {transaction.itemType === 'CREDITS' ? 'Recharge de crédits' : transaction.species}
                 </Typography>
                 <Typography variant="body2" color="text.secondary">
-                  {transaction.itemType === 'CREDITS' ? '— Achat —' : `— Paris ${formatOrdinalFr(transaction.arrondissement)} —`}
+                  {transaction.itemType === 'CREDITS' ? '— Achat —' : '— Arbre —'}
                 </Typography>
                 <Typography variant="body2" sx={{ fontWeight: 600, color: transaction.itemType === 'CREDITS' ? 'success.main' : 'inherit' }}>
                   {transaction.itemType === 'CREDITS' ? '+' : ''}{formatCredits(transaction.pricePaid)}

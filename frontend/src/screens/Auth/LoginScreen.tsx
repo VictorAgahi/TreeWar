@@ -35,7 +35,7 @@ export const LoginScreen: React.FC = () => {
     try {
       const result = await executeLogin({ data });
       login(result.accessToken);
-      navigate('/dashboard');
+      navigate('/map');
     } catch {
     }
   };

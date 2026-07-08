@@ -102,39 +102,49 @@ function adaptRemarkableTree(record: RemarkableTreeApiRecord): ParisTree | null 
 // trees) are two distinct exports from the City of Paris with only marginal overlap
 // (3 out of ~184 remarkable trees also appear in the general dataset). We merge them
 // and let the remarkable record win when both exist for the same idbase.
+let cachedTreesPromise: Promise<ParisTree[]> | null = null;
+
 export async function fetchAllParisTrees(onProgress?: (loaded: number, total: number) => void): Promise<ParisTree[]> {
-  const progressState = { base: { loaded: 0, total: 0 }, remarkable: { loaded: 0, total: 0 } };
-  const reportProgress = () => {
-    const loaded = progressState.base.loaded + progressState.remarkable.loaded;
-    const total = progressState.base.total + progressState.remarkable.total;
-    onProgress?.(loaded, total);
-  };
+  if (cachedTreesPromise) {
+    const trees = await cachedTreesPromise;
+    onProgress?.(trees.length, trees.length);
+    return trees;
+  }
 
-  const [baseRecords, remarkableRecords] = await Promise.all([
-    fetchAllPages<ParisTreeApiRecord>(LES_ARBRES_URL, (loaded, total) => {
-      progressState.base = { loaded, total };
-      reportProgress();
-    }),
-    fetchAllPages<RemarkableTreeApiRecord>(REMARKABLE_TREES_URL, (loaded, total) => {
-      progressState.remarkable = { loaded, total };
-      reportProgress();
-    }),
-  ]);
+  cachedTreesPromise = (async () => {
+    const progressState = { base: { loaded: 0, total: 0 }, remarkable: { loaded: 0, total: 0 } };
+    const reportProgress = () => {
+      const loaded = progressState.base.loaded + progressState.remarkable.loaded;
+      const total = progressState.base.total + progressState.remarkable.total;
+      onProgress?.(loaded, total);
+    };
 
-  // The source dataset itself contains an occasional exact duplicate row (same
-  // idbase) — dedupe defensively rather than trust it's clean.
-  const remarkableTrees = [
-    ...new Map(
-      remarkableRecords.map(adaptRemarkableTree).filter((tree): tree is ParisTree => tree !== null)
-        .map((tree) => [tree.id, tree]),
-    ).values(),
-  ];
-  const remarkableIds = new Set(remarkableTrees.map((tree) => tree.id));
+    const [baseRecords, remarkableRecords] = await Promise.all([
+      fetchAllPages<ParisTreeApiRecord>(LES_ARBRES_URL, (loaded, total) => {
+        progressState.base = { loaded, total };
+        reportProgress();
+      }),
+      fetchAllPages<RemarkableTreeApiRecord>(REMARKABLE_TREES_URL, (loaded, total) => {
+        progressState.remarkable = { loaded, total };
+        reportProgress();
+      }),
+    ]);
 
-  const baseTrees = baseRecords
-    .map(adaptTree)
-    .filter((tree): tree is ParisTree => tree !== null)
-    .filter((tree) => !remarkableIds.has(tree.id));
+    const remarkableTrees = [
+      ...new Map(
+        remarkableRecords.map(adaptRemarkableTree).filter((tree): tree is ParisTree => tree !== null)
+          .map((tree) => [tree.id, tree]),
+      ).values(),
+    ];
+    const remarkableIds = new Set(remarkableTrees.map((tree) => tree.id));
 
-  return [...baseTrees, ...remarkableTrees];
+    const baseTrees = baseRecords
+      .map(adaptTree)
+      .filter((tree): tree is ParisTree => tree !== null)
+      .filter((tree) => !remarkableIds.has(tree.id));
+
+    return [...baseTrees, ...remarkableTrees];
+  })();
+
+  return cachedTreesPromise;
 }

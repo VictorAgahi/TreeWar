@@ -8,7 +8,7 @@ import { Card } from '../../atoms/Card/Card';
 import { Chip } from '../../atoms/Chip/Chip';
 import { Typography } from '../../atoms/Typography/Typography';
 import type { SponsoredTree } from '../../../types/dashboard.types';
-import { formatCredits, formatDateFr, formatOrdinalFr } from '../../../utils/format';
+import { formatCredits, formatDateFr } from '../../../utils/format';
 
 export interface PremiumTreeCardProps {
   tree: SponsoredTree;
@@ -50,9 +50,7 @@ export const PremiumTreeCard: React.FC<PremiumTreeCardProps> = ({ tree, mapLink,
               size="small"
               sx={{ alignSelf: 'flex-start', fontWeight: 600 }}
             />
-            <Typography variant="body2" color="text.secondary">
-              Paris {formatOrdinalFr(tree.arrondissement)} arrondissement
-            </Typography>
+
             <Typography variant="body2" color="text.secondary">
               Parrainé le {formatDateFr(tree.purchasedAt)}
             </Typography>

@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useCallback, useRef, useMemo } from 'react';
 import { MapContainer, TileLayer, CircleMarker, Tooltip, useMapEvents, useMap } from 'react-leaflet';
 import type { Map as LeafletMap, LatLngBounds } from 'leaflet';
-import { Backdrop, CircularProgress, Alert, Box, Autocomplete, TextField, createFilterOptions, Fab, Popover, IconButton, Select, MenuItem, InputLabel, FormControl, Stack } from '@mui/material';
+import { Backdrop, CircularProgress, Alert, Box, Autocomplete, TextField, createFilterOptions, Fab, Popover, IconButton, Select, MenuItem, InputLabel, FormControl, Stack, Dialog, DialogTitle, DialogContent, DialogActions, Button } from '@mui/material';
 import DarkModeIcon from '@mui/icons-material/DarkMode';
 import LightModeIcon from '@mui/icons-material/LightMode';
 import FilterListIcon from '@mui/icons-material/FilterList';
@@ -11,6 +11,7 @@ import { useAppTheme } from '../../../context/ThemeContext';
 import { Typography } from '../../atoms/Typography/Typography';
 import { InvesTreeInfoPanel } from '../../molecules/TreeWarInfoPanel/TreeWarInfoPanel';
 import { MapLegend } from '../../molecules/MapLegend/MapLegend';
+import confetti from 'canvas-confetti';
 import { axiosClient } from '../../../api/axiosClient';
 import type { ParisTree } from '../../../types/tree';
 import { fetchAllParisTrees } from '../../../api/parisTreesApi';
@@ -60,6 +61,7 @@ export const InvesTreeMap: React.FC = () => {
   const [progressMsg, setProgressMsg] = useState<string>('Chargement des arbres du serveur...');
   const [error, setError] = useState<string | null>(null);
   const [selectedTree, setSelectedTree] = useState<ParisTree | null>(null);
+  const [showSuccessPopup, setShowSuccessPopup] = useState(false);
   const [mapBounds, setMapBounds] = useState<LatLngBounds | null>(null);
   const { user } = useAuth();
   const { mode, toggleColorMode } = useAppTheme();
@@ -132,6 +134,14 @@ export const InvesTreeMap: React.FC = () => {
   const handleBuySuccess = () => {
     setSelectedTree(null);
     fetchTrees();
+    setShowSuccessPopup(true);
+    confetti({
+      particleCount: 150,
+      spread: 70,
+      origin: { y: 0.6 },
+      colors: ['#2E7D32', '#FFC107', '#4CAF50'],
+      zIndex: 2000,
+    });
   };
 
   const handleBoundsChange = useCallback((bounds: LatLngBounds) => {
@@ -390,6 +400,35 @@ export const InvesTreeMap: React.FC = () => {
           {progressMsg}
         </Typography>
       </Backdrop>
+
+      <Dialog
+        open={showSuccessPopup}
+        onClose={() => setShowSuccessPopup(false)}
+      >
+        <Box sx={{ p: 2, textAlign: 'center' }}>
+          <DialogTitle sx={{ fontWeight: 800, color: 'primary.main', fontSize: '1.5rem' }}>
+            🎉 Bravo ! 🎉
+          </DialogTitle>
+          <DialogContent>
+            <Typography variant="body1" sx={{ mt: 1, fontSize: '1.1rem' }}>
+              Vous venez d'acquérir un nouvel arbre avec succès !
+            </Typography>
+            <Typography variant="body2" color="text.secondary" sx={{ mt: 2 }}>
+              Merci de contribuer à rendre la ville plus verte. Votre arbre est désormais visible sur la carte et vous appartient !
+            </Typography>
+          </DialogContent>
+          <DialogActions sx={{ justifyContent: 'center', pb: 2 }}>
+            <Button 
+              variant="contained" 
+              size="large" 
+              onClick={() => setShowSuccessPopup(false)}
+              sx={{ borderRadius: 8, px: 4, fontWeight: 700 }}
+            >
+              Génial !
+            </Button>
+          </DialogActions>
+        </Box>
+      </Dialog>
     </div>
   );
 };
