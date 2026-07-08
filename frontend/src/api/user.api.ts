@@ -41,8 +41,8 @@ export const userApi = {
     method: 'GET',
   }),
 
-  getLeaderboardMostExpensiveTree: (): AxiosRequestConfig => ({
-    url: '/user/leaderboard/most-expensive-tree',
+  getLeaderboardMostExpensiveTree: (limit?: number): AxiosRequestConfig => ({
+    url: limit ? `/user/leaderboard/most-expensive-tree?limit=${limit}` : '/user/leaderboard/most-expensive-tree',
     method: 'GET',
   }),
 

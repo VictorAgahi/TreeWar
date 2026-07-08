@@ -13,6 +13,7 @@ import { Typography } from '../../atoms/Typography/Typography';
 import { IconButton } from '../../atoms/IconButton/IconButton';
 import { NavLinksList } from '../../molecules/NavLinksList/NavLinksList';
 import { CompanyBadge } from '../../molecules/CompanyBadge/CompanyBadge';
+import { LeaderboardTicker } from '../../molecules/LeaderboardTicker/LeaderboardTicker';
 import type { NavLinkItemProps } from '../../molecules/NavLinkItem/NavLinkItem';
 import { useAuth } from '../../../context/AuthContext';
 
@@ -81,6 +82,8 @@ export const Navbar: React.FC = () => {
           <NavLinksList links={NAV_LINKS} direction="column" onNavigate={closeMobileMenu} />
         </Box>
       </Drawer>
+
+      <LeaderboardTicker />
     </>
   );
 };

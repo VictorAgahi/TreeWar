@@ -2,7 +2,7 @@ import type { SpendingPoint, SponsoredTree } from '../../types/dashboard.types';
 import { formatDateFr } from '../../utils/format';
 
 /** Estimation : nombre de crédits investis finançant un arbre réellement planté. */
-export const CREDITS_PER_REAL_TREE = 3;
+export const CREDITS_PER_REAL_TREE = 250;
 
 export const getTotalInvested = (trees: SponsoredTree[]): number =>
   trees.reduce((total, tree) => total + tree.pricePaid, 0);
